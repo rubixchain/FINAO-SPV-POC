@@ -1,10 +1,27 @@
 const express = require('express');
 const umbral = require("@nucypher/umbral-pre");
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// Swagger setup
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Rubix SmartEncryptDecrypt API',
+      version: '1.0.0',
+      description: 'An API to demonstrate Rubix Smart Contract encryption and decryption',
+    },
+  },
+  apis: ['./server.js'],
+};
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 function bytesToHex(bytes) {
   return Array.from(bytes, (byte) => {
@@ -20,6 +37,15 @@ function hexToBytes(hex) {
   return new Uint8Array(bytes);
 }
 
+/**
+ * @swagger
+ * /generate-secret-key:
+ *   get:
+ *     summary: Generate a secret key and its corresponding public key
+ *     responses:
+ *       200:
+ *         description: Returns the secret key and public key in hexadecimal format
+ */
 app.get('/generate-secret-key', (req, res) => {
   let secretKey = umbral.SecretKey.random();
   let secretKeyBytes = secretKey.toBEBytes(); //Secret key to Big Endian bytes as noted from the rust-umbral-pre documentation
@@ -32,6 +58,28 @@ app.get('/generate-secret-key', (req, res) => {
   res.json({ secretKey: secretKeyHex, publicKey: publicKeyHex });
 });
 
+/**
+ * @swagger
+ * /encrypt:
+ *   post:
+ *     summary: Encrypt a plaintext using a given public key
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               public_key:
+ *                 type: string
+ *               plaintext:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Returns the encrypted data and the capsule
+ *       400:
+ *         description: Missing required parameters
+ */
 app.post('/encrypt', (req, res) => {
     let { public_key, plaintext } = req.body;
     console.log(req.body)
@@ -52,6 +100,30 @@ app.post('/encrypt', (req, res) => {
     return res.json({ capsule: capsuleHex, ciphertext: cipherTextHex });
 });
 
+/**
+ * @swagger
+ * /decrypt:
+ *   post:
+ *     summary: Decrypt a ciphertext using a given secret key and capsule
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               secretKey:
+ *                 type: string
+ *               capsule:
+ *                 type: string
+ *               ciphertext:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Returns the decrypted plaintext
+ *       400:
+ *         description: Missing required parameters
+ */
 app.post('/decrypt', (req, res) => {
     let dec = new TextDecoder("utf-8");
     const { secretKey, capsule, ciphertext } = req.body;
@@ -75,4 +147,5 @@ app.post('/decrypt', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  console.log(`Swagger UI available at http://localhost:${port}/api-docs`);
 });
