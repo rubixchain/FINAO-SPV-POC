@@ -125,8 +125,8 @@ func (repo *Repository) GetPrivateDataByDID(did string) (*model.PrivateData, err
 	var privateData model.PrivateData
 	err := repo.db.QueryRow(query, did).Scan(
 		&privateData.PvtDataID,
-		&privateData.FocusArea,
-		&privateData.Communities,
+		&privateData.Capsule,
+		&privateData.CipherText,
 		&privateData.UserID,
 		&privateData.CreatedAt,
 		&privateData.UpdatedAt,
@@ -166,8 +166,8 @@ func (repo *Repository) GetAllAccessDataByDID(did string) ([]model.PrivateData, 
 		var privateData model.PrivateData
 		err := rows.Scan(
 			&privateData.PvtDataID,
-			&privateData.FocusArea,
-			&privateData.Communities,
+			&privateData.Capsule,
+			&privateData.CipherText,
 			&privateData.UserID,
 			&privateData.CreatedAt,
 			&privateData.UpdatedAt,
