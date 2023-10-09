@@ -160,7 +160,7 @@ func (s *Service) GetAllPublicDataByDID(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Create a PublicDataResponse from the retrieved data
-	response := &model.DataResponse{
+	response := &model.PublicDataResponse{
 		FocusArea:   publicData.FocusArea,
 		Communities: publicData.Communities,
 		UserID:      publicData.UserID,
@@ -184,19 +184,19 @@ func (s *Service) GetAllPrivateDataByDID(w http.ResponseWriter, r *http.Request)
 
 	// TODO: Query the database to fetch public data for the user with the given DID
 	// Replace the following line with your database query logic
-	publicData, err := s.storage.GetPrivateDataByDID(did)
+	privateData, err := s.storage.GetPrivateDataByDID(did)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Create a PublicDataResponse from the retrieved data
-	response := &model.DataResponse{
-		FocusArea:   publicData.FocusArea,
-		Communities: publicData.Communities,
-		UserID:      publicData.UserID,
-		DID:         did,
+	// Create a PrivateDataResponse from the retrieved data
+	response := &model.PrivateDataResponse{
+		Capsule:    privateData.Capsule,
+		CipherText: privateData.CipherText,
+		UserID:     privateData.UserID,
+		DID:        did,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -223,15 +223,15 @@ func (s *Service) GetAllAccessDataByDID(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Create a response slice for private data
-	var responseList []model.DataResponse
+	var responseList []model.PrivateDataResponse
 
 	// Convert the retrieved private data into the desired response format
 	for _, privateData := range privateDataList {
-		response := model.DataResponse{
-			FocusArea:   privateData.FocusArea,
-			Communities: privateData.Communities,
-			UserID:      privateData.UserID,
-			DID:         did,
+		response := model.PrivateDataResponse{
+			Capsule:    privateData.Capsule,
+			CipherText: privateData.CipherText,
+			UserID:     privateData.UserID,
+			DID:        did,
 		}
 		responseList = append(responseList, response)
 	}
