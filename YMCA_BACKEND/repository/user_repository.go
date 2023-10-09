@@ -148,7 +148,7 @@ func (repo *Repository) GetAllAccessDataByDID(did string) ([]model.PrivateData, 
 	query := `
 		SELECT pd.pvt_data_id, pd.focus_area, pd.communities, pd.user_id, pd.created_at, pd.updated_at
 		FROM private_data pd
-		INNER JOIN access_sheet as ON pd.pvt_data_id = as.pvt_data_id
+		INNER JOIN access_sheet as as ON pd.pvt_data_id = as.pvt_data_id
 		INNER JOIN users u ON as.decrypt_user_id = u.user_id
 		WHERE u.did = ?;`
 
