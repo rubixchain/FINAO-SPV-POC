@@ -27,12 +27,12 @@ type PublicData struct {
 
 // PrivateData represents private data associated with a user.
 type PrivateData struct {
-	PvtDataID   int       `json:"pvt_data_id" db:"pvt_data_id primarykey"`
-	FocusArea   string    `json:"focus_area" db:"focus_area"`
-	Communities string    `json:"communities" db:"communities"`
-	UserID      int       `json:"user_id" db:"user_id foreignkey"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	PvtDataID  int       `json:"pvt_data_id" db:"pvt_data_id primarykey"`
+	Capsule    string    `json:"capsule" db:"capsule"`
+	CipherText string    `json:"cipher_text" db:"cipher_text"`
+	UserID     int       `json:"user_id" db:"user_id foreignkey"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // AccessSheet represents access information for private data.
@@ -67,9 +67,16 @@ type LogInResponse struct {
 	Message string `json:"message"`
 }
 
-type DataResponse struct {
+type PublicDataResponse struct {
 	FocusArea   string `json:"focus_area" db:"focus_area"`
 	Communities string `json:"communities" db:"communities"`
 	UserID      int    `json:"user_id" db:"user_id"`
 	DID         string `db:"did" json:"did"`
+}
+
+type PrivateDataResponse struct {
+	Capsule    string `json:"capsule" db:"capsule"`
+	CipherText string `json:"cipher_text" db:"cipher_text"`
+	UserID     int    `json:"user_id" db:"user_id"`
+	DID        string `db:"did" json:"did"`
 }
