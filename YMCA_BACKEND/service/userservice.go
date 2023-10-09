@@ -145,7 +145,7 @@ func (s *Service) LogIn(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param did query string true "User's DID"
-// @Success 200 {object} DataResponse
+// @Success 200 {object} model.PublicDataResponse
 // @Router /getAllPublicDataByDID [get]
 func (s *Service) GetAllPublicDataByDID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -177,7 +177,7 @@ func (s *Service) GetAllPublicDataByDID(w http.ResponseWriter, r *http.Request) 
 // @Accept json
 // @Produce json
 // @Param did query string true "User's DID"
-// @Success 200 {object} DataResponse
+// @Success 200 {object} model.PrivateDataResponse
 // @Router /getAllPrivateDataByDID [get]
 func (s *Service) GetAllPrivateDataByDID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -209,7 +209,7 @@ func (s *Service) GetAllPrivateDataByDID(w http.ResponseWriter, r *http.Request)
 // @Accept json
 // @Produce json
 // @Param did query string true "User's DID"
-// @Success 200 {object} DataResponse
+// @Success 200 {object} []model.PrivateDataResponse
 // @Router /getAllAccessDatabyDID [get]
 func (s *Service) GetAllAccessDataByDID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
