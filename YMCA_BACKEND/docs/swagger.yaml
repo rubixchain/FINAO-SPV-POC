@@ -1,0 +1,83 @@
+definitions:
+  model.LogInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.LogInResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: boolean
+      userID:
+        type: integer
+    type: object
+  model.SignUpRequest:
+    properties:
+      date_of_birth:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  model.SignUpResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: boolean
+      userID:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to authenticate existing user log in
+      parameters:
+      - description: enter email and password
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.LogInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LogInResponse'
+      summary: Return user data
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to when new user signs up
+      parameters:
+      - description: enter email and phone number
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SignUpResponse'
+      summary: Return user data
+swagger: "2.0"
