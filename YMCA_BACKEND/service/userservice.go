@@ -1,13 +1,14 @@
 package service
 
 import (
-	"YMCA_BACKEND/model"
-	"YMCA_BACKEND/util"
 	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/rubixchain/FINAO-SPV-POC/YMCA_BACKEND/model"
+	"github.com/rubixchain/FINAO-SPV-POC/YMCA_BACKEND/util"
 
 	"github.com/gorilla/mux"
 )
