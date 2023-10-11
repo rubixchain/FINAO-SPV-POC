@@ -16,6 +16,68 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/addPrivateData": {
+            "post": {
+                "description": "This endpoint is used to add Private Data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "add Private Data",
+                "parameters": [
+                    {
+                        "description": "enter the details",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.PrivateDataInputReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BasicResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/addPublicData": {
+            "post": {
+                "description": "This endpoint is used to add Public Data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "add Public Data",
+                "parameters": [
+                    {
+                        "description": "enter details",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.PublicDataInputReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BasicResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/getAllAccessDatabyDID": {
             "get": {
                 "description": "Get rivate data that has been given access to a  DID",
@@ -170,6 +232,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.BasicResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
         "model.LogInRequest": {
             "type": "object",
             "properties": {
@@ -195,6 +268,20 @@ const docTemplate = `{
                 }
             }
         },
+        "model.PrivateDataInputReq": {
+            "type": "object",
+            "properties": {
+                "capsule": {
+                    "type": "string"
+                },
+                "cipher_text": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.PrivateDataResponse": {
             "type": "object",
             "properties": {
@@ -205,6 +292,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "did": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PublicDataInputReq": {
+            "type": "object",
+            "properties": {
+                "communities": {
+                    "type": "string"
+                },
+                "focus_area": {
                     "type": "string"
                 },
                 "user_id": {

@@ -1,4 +1,11 @@
 definitions:
+  model.BasicResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
   model.LogInRequest:
     properties:
       email:
@@ -15,6 +22,15 @@ definitions:
       userID:
         type: integer
     type: object
+  model.PrivateDataInputReq:
+    properties:
+      capsule:
+        type: string
+      cipher_text:
+        type: string
+      user_id:
+        type: integer
+    type: object
   model.PrivateDataResponse:
     properties:
       capsule:
@@ -22,6 +38,15 @@ definitions:
       cipher_text:
         type: string
       did:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PublicDataInputReq:
+    properties:
+      communities:
+        type: string
+      focus_area:
         type: string
       user_id:
         type: integer
@@ -62,6 +87,46 @@ definitions:
 info:
   contact: {}
 paths:
+  /addPrivateData:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to add Private Data
+      parameters:
+      - description: enter the details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.PrivateDataInputReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: add Private Data
+  /addPublicData:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to add Public Data
+      parameters:
+      - description: enter details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.PublicDataInputReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: add Public Data
   /getAllAccessDatabyDID:
     get:
       consumes:
