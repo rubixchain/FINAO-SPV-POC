@@ -184,3 +184,45 @@ func (repo *Repository) GetAllAccessDataByDID(did string) ([]model.PrivateData, 
 
 	return privateDataList, nil
 }
+
+// AddPublicData inserts a new public data entry into the PublicData table.
+func (r *Repository) AddPublicData(data *model.PublicData) error {
+	// Define the SQL query to insert a new public data entry.
+	query := `
+        INSERT INTO publicdata (focus_area, communities, user_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+    `
+
+	// Execute the SQL query to insert the new public data entry.
+	_, err := r.db.Exec(
+		query,
+		data.FocusArea,
+		data.Communities,
+		data.UserID,
+		time.Now(), // CreatedAt
+		time.Now(), // UpdatedAt
+	)
+
+	return err
+}
+
+// AddPrivateData inserts a new private data entry into the PrivateData table.
+func (r *Repository) AddPrivateData(data *model.PrivateData) error {
+	// Define the SQL query to insert a new private data entry.
+	query := `
+        INSERT INTO privatedata (capsule, cipher_text, user_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+    `
+
+	// Execute the SQL query to insert the new private data entry.
+	_, err := r.db.Exec(
+		query,
+		data.Capsule,
+		data.CipherText,
+		data.UserID,
+		time.Now(), // CreatedAt
+		time.Now(), // UpdatedAt
+	)
+
+	return err
+}

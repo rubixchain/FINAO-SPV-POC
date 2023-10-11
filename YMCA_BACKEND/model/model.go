@@ -92,3 +92,8 @@ type PrivateDataInputReq struct {
 	CipherText string `json:"cipher_text" db:"cipher_text"`
 	UserID     int    `json:"user_id" db:"user_id foreignkey"`
 }
+
+type BasicResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}

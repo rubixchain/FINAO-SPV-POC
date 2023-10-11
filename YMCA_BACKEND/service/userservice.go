@@ -240,3 +240,85 @@ func (s *Service) GetAllAccessDataByDID(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(responseList)
 }
+
+// addPublicData
+// @Summary add Public Data
+// @Description This endpoint is used to add Public Data
+// @Accept json
+// @Produce json
+// @Param user body model.PublicDataInputReq true "enter details"
+// @Success 200 {object} model.BasicResponse
+// @Router /addPublicData [post]
+func (s *Service) AddPublicData(w http.ResponseWriter, r *http.Request) {
+	var addPubDataReq model.PublicDataInputReq
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&addPubDataReq); err != nil {
+		http.Error(w, "Failed to parse JSON request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res := &model.BasicResponse{
+		Status: false,
+	}
+	pubData := &model.PublicData{
+		FocusArea:   addPubDataReq.FocusArea,
+		Communities: addPubDataReq.Communities,
+		UserID:      addPubDataReq.UserID,
+	}
+	err := s.storage.AddPublicData(pubData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	res.Status = true
+	res.Message = "Public data added successfully"
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// addPrivateData
+// @Summary add Private Data
+// @Description This endpoint is used to add Private Data
+// @Accept json
+// @Produce json
+// @Param user body model.PrivateDataInputReq true "enter the details"
+// @Success 200 {object} model.BasicResponse
+// @Router /addPrivateData [post]
+func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
+	var addPvtDataReq model.PrivateDataInputReq
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&addPvtDataReq); err != nil {
+		http.Error(w, "Failed to parse JSON request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res := &model.BasicResponse{
+		Status: false,
+	}
+	pvtData := &model.PrivateData{
+		Capsule:    addPvtDataReq.Capsule,
+		CipherText: addPvtDataReq.CipherText,
+		UserID:     addPvtDataReq.UserID,
+	}
+	err := s.storage.AddPrivateData(pvtData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	res.Status = true
+	res.Message = "Private data added successfully"
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
