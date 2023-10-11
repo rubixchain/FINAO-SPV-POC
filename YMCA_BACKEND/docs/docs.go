@@ -16,6 +16,96 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/getAllAccessDatabyDID": {
+            "get": {
+                "description": "Get rivate data that has been given access to a  DID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return user private data that has been given access to a  DID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's DID",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.PrivateDataResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/getAllPrivateDataByDID": {
+            "get": {
+                "description": "Get private data for a user by their DID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return user private data by DID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's DID",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.PrivateDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/getAllPublicDataByDID": {
+            "get": {
+                "description": "Get public data for a user by their DID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return user public data by DID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's DID",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.PublicDataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "This endpoint is used to authenticate existing user log in",
@@ -101,6 +191,40 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PrivateDataResponse": {
+            "type": "object",
+            "properties": {
+                "capsule": {
+                    "type": "string"
+                },
+                "cipher_text": {
+                    "type": "string"
+                },
+                "did": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PublicDataResponse": {
+            "type": "object",
+            "properties": {
+                "communities": {
+                    "type": "string"
+                },
+                "did": {
+                    "type": "string"
+                },
+                "focus_area": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }

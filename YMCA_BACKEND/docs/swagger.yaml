@@ -15,6 +15,28 @@ definitions:
       userID:
         type: integer
     type: object
+  model.PrivateDataResponse:
+    properties:
+      capsule:
+        type: string
+      cipher_text:
+        type: string
+      did:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PublicDataResponse:
+    properties:
+      communities:
+        type: string
+      did:
+        type: string
+      focus_area:
+        type: string
+      user_id:
+        type: integer
+    type: object
   model.SignUpRequest:
     properties:
       date_of_birth:
@@ -40,6 +62,65 @@ definitions:
 info:
   contact: {}
 paths:
+  /getAllAccessDatabyDID:
+    get:
+      consumes:
+      - application/json
+      description: Get rivate data that has been given access to a  DID
+      parameters:
+      - description: User's DID
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.PrivateDataResponse'
+            type: array
+      summary: Return user private data that has been given access to a  DID
+  /getAllPrivateDataByDID:
+    get:
+      consumes:
+      - application/json
+      description: Get private data for a user by their DID
+      parameters:
+      - description: User's DID
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PrivateDataResponse'
+      summary: Return user private data by DID
+  /getAllPublicDataByDID:
+    get:
+      consumes:
+      - application/json
+      description: Get public data for a user by their DID
+      parameters:
+      - description: User's DID
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PublicDataResponse'
+      summary: Return user public data by DID
   /login:
     post:
       consumes:
