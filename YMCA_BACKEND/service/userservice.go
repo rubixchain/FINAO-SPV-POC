@@ -299,7 +299,7 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := &model.BasicResponse{
+	res := &model.AddPrivateDataResponse{
 		Status: false,
 	}
 	pvtData := &model.PrivateData{
@@ -307,13 +307,26 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		CipherText: addPvtDataReq.CipherText,
 		UserID:     addPvtDataReq.UserID,
 	}
-	err := s.storage.AddPrivateData(pvtData)
+	pvtDataId, err := s.storage.AddPrivateData(pvtData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	accessDataMap := &model.AccessSheet{
+		PvtDataID:     pvtDataId,
+		DecryptUserID: addPvtDataReq.DecryptUserID,
+	}
+
+	accessID, err := s.storage.AddAccess(accessDataMap)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	res.Status = true
-	res.Message = "Private data added successfully"
+	res.Message = "Private data added successfully, Access to Pvt data given"
+	res.AccessID = accessID
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -321,4 +334,108 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// @Summary Return user id when DID is given
+// @Description Get user id when DID is given
+// @Accept json
+// @Produce json
+// @Param did query string true "User's DID"
+// @Success 200 {object} model.BasicResponse
+// @Router /getUserIDbyDID [get]
+func (s *Service) GetUserIDbyDID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	did := vars["did"]
+
+	// Query the database to fetch the user ID for the user with the given DID
+	userID, err := s.storage.GetUserIDByDID(did)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a response for the user's ID
+	response := model.BasicResponse{
+		UserID:  userID,
+		DID:     did,
+		Status:  true,
+		Message: "UserID found",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// @Summary Return user DID when ID is given
+// @Description Get user DID when ID is given
+// @Accept json
+// @Produce json
+// @Param did query string true "User's ID"
+// @Success 200 {object} model.BasicResponse
+// @Router /getDIDbyUserID [get]
+func (s *Service) GetDIDbyUserID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userIDStr := vars["user_id"]
+
+	// Parse the user_id as an integer
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		http.Error(w, "Invalid user_id", http.StatusBadRequest)
+		return
+	}
+
+	// Query the repository to get the DID by user ID
+	did, err := s.storage.GetDIDByUserID(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a response with the user ID and DID
+	response := model.BasicResponse{
+		Status:  true,
+		Message: "DID retrieved successfully",
+		UserID:  userID,
+		DID:     did,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// @Summary Return user DID when ID is given
+// @Description Get user DID when ID is given
+// @Accept json
+// @Produce json
+// @Param id query int true "User's ID"
+// @Success 200 {object} model.PvtDataResponse
+// @Router /getPvtDatabyID [get]
+func (s *Service) GetPvtDataByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userIDStr := vars["id"]
+
+	// Parse the user ID as an integer
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	// Query the repository to get private data for the user
+	pvtDataList, err := s.storage.GetPvtDataByUserID(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a response with the private data
+	response := model.PvtDataResponse{
+		Status:      true,
+		Message:     "Private data retrieved successfully",
+		PrivateData: pvtDataList,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }

@@ -88,12 +88,27 @@ type PublicDataInputReq struct {
 }
 
 type PrivateDataInputReq struct {
-	Capsule    string `json:"capsule" db:"capsule"`
-	CipherText string `json:"cipher_text" db:"cipher_text"`
-	UserID     int    `json:"user_id" db:"user_id foreignkey"`
+	Capsule       string `json:"capsule" db:"capsule"`
+	CipherText    string `json:"cipher_text" db:"cipher_text"`
+	UserID        int    `json:"user_id" db:"user_id foreignkey"`
+	DecryptUserID int    `json:"decrypt_user_id" db:"decrypt_user_id"`
+}
+
+type AddPrivateDataResponse struct {
+	Status   bool   `json:"status"`
+	Message  string `json:"message"`
+	AccessID int    `json:"access_id"`
 }
 
 type BasicResponse struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
+	UserID  int    `json:user_id"`
+	DID     string `json:did"`
+}
+
+type PvtDataResponse struct {
+	Status      bool          `json:"status"`
+	Message     string        `json:"message"`
+	PrivateData []PrivateData `json:"privateData"`
 }

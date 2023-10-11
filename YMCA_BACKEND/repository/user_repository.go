@@ -207,7 +207,7 @@ func (r *Repository) AddPublicData(data *model.PublicData) error {
 }
 
 // AddPrivateData inserts a new private data entry into the PrivateData table.
-func (r *Repository) AddPrivateData(data *model.PrivateData) error {
+func (r *Repository) AddPrivateData(data *model.PrivateData) (int, error) {
 	// Define the SQL query to insert a new private data entry.
 	query := `
         INSERT INTO privatedata (capsule, cipher_text, user_id, created_at, updated_at)
@@ -215,7 +215,7 @@ func (r *Repository) AddPrivateData(data *model.PrivateData) error {
     `
 
 	// Execute the SQL query to insert the new private data entry.
-	_, err := r.db.Exec(
+	result, err := r.db.Exec(
 		query,
 		data.Capsule,
 		data.CipherText,
@@ -223,6 +223,100 @@ func (r *Repository) AddPrivateData(data *model.PrivateData) error {
 		time.Now(), // CreatedAt
 		time.Now(), // UpdatedAt
 	)
+	if err != nil {
+		return 0, err
+	}
 
-	return err
+	pvtDataID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(pvtDataID), nil
+}
+
+func (r *Repository) AddAccess(accessSheet *model.AccessSheet) (int, error) {
+	// Define the SQL query to insert an access sheet entry
+	query := `
+		INSERT INTO access_sheet (pvt_data_id, decrypt_user_id)
+		VALUES (?, ?);
+	`
+
+	// Execute the query to insert the access sheet entry
+	result, err := r.db.Exec(query, accessSheet.PvtDataID, accessSheet.DecryptUserID)
+	if err != nil {
+		return 0, err
+	}
+
+	// Retrieve the last inserted ID (access ID)
+	accessID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(accessID), nil
+}
+
+func (r *Repository) GetUserIDByDID(did string) (int, error) {
+	// Define the SQL query to retrieve the user ID by DID
+	query := "SELECT user_id FROM users WHERE did = ?;"
+
+	var userID int
+	err := r.db.QueryRow(query, did).Scan(&userID)
+	if err != nil {
+		return 0, err
+	}
+
+	return userID, nil
+}
+
+func (r *Repository) GetDIDByUserID(userID int) (string, error) {
+	// Define the SQL query to retrieve the DID by user ID
+	query := "SELECT did FROM users WHERE user_id = ?;"
+
+	var did string
+	err := r.db.QueryRow(query, userID).Scan(&did)
+	if err != nil {
+		return "", err
+	}
+
+	return did, nil
+}
+
+func (r *Repository) GetPvtDataByUserID(userID int) ([]model.PrivateData, error) {
+	// Define the SQL query to fetch private data by user ID
+	query := `
+        SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text
+        FROM private_data pd
+        INNER JOIN access_sheet as ON pd.pvt_data_id = as.pvt_data_id
+        WHERE as.decrypt_user_id = ?;`
+
+	// Execute the query and retrieve the private data
+	rows, err := r.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var privateDataList []model.PrivateData
+
+	// Iterate through the rows and populate the private data list
+	for rows.Next() {
+		var privateData model.PrivateData
+		err := rows.Scan(
+			&privateData.PvtDataID,
+			&privateData.Capsule,
+			&privateData.CipherText,
+		)
+		if err != nil {
+			return nil, err
+		}
+		privateDataList = append(privateDataList, privateData)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return privateDataList, nil
 }
