@@ -168,6 +168,93 @@ const docTemplate = `{
                 }
             }
         },
+        "/getDIDbyUserID": {
+            "get": {
+                "description": "Get user DID when ID is given",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return user DID when ID is given",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's ID",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BasicResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/getPvtDatabyID": {
+            "get": {
+                "description": "Get user DID when ID is given",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return user DID when ID is given",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User's ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.PvtDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/getUserIDbyDID": {
+            "get": {
+                "description": "Get user id when DID is given",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return user id when DID is given",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's DID",
+                        "name": "did",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BasicResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "This endpoint is used to authenticate existing user log in",
@@ -235,11 +322,17 @@ const docTemplate = `{
         "model.BasicResponse": {
             "type": "object",
             "properties": {
+                "did": {
+                    "type": "string"
+                },
                 "message": {
                     "type": "string"
                 },
                 "status": {
                     "type": "boolean"
+                },
+                "userID": {
+                    "type": "integer"
                 }
             }
         },
@@ -268,6 +361,29 @@ const docTemplate = `{
                 }
             }
         },
+        "model.PrivateData": {
+            "type": "object",
+            "properties": {
+                "capsule": {
+                    "type": "string"
+                },
+                "cipher_text": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "pvt_data_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.PrivateDataInputReq": {
             "type": "object",
             "properties": {
@@ -276,6 +392,9 @@ const docTemplate = `{
                 },
                 "cipher_text": {
                     "type": "string"
+                },
+                "decrypt_user_id": {
+                    "type": "integer"
                 },
                 "user_id": {
                     "type": "integer"
@@ -327,6 +446,23 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.PvtDataResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "privateData": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.PrivateData"
+                    }
+                },
+                "status": {
+                    "type": "boolean"
                 }
             }
         },

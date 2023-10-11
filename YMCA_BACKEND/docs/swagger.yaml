@@ -1,10 +1,14 @@
 definitions:
   model.BasicResponse:
     properties:
+      did:
+        type: string
       message:
         type: string
       status:
         type: boolean
+      userID:
+        type: integer
     type: object
   model.LogInRequest:
     properties:
@@ -22,12 +26,29 @@ definitions:
       userID:
         type: integer
     type: object
+  model.PrivateData:
+    properties:
+      capsule:
+        type: string
+      cipher_text:
+        type: string
+      created_at:
+        type: string
+      pvt_data_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
   model.PrivateDataInputReq:
     properties:
       capsule:
         type: string
       cipher_text:
         type: string
+      decrypt_user_id:
+        type: integer
       user_id:
         type: integer
     type: object
@@ -61,6 +82,17 @@ definitions:
         type: string
       user_id:
         type: integer
+    type: object
+  model.PvtDataResponse:
+    properties:
+      message:
+        type: string
+      privateData:
+        items:
+          $ref: '#/definitions/model.PrivateData'
+        type: array
+      status:
+        type: boolean
     type: object
   model.SignUpRequest:
     properties:
@@ -186,6 +218,63 @@ paths:
           schema:
             $ref: '#/definitions/model.PublicDataResponse'
       summary: Return user public data by DID
+  /getDIDbyUserID:
+    get:
+      consumes:
+      - application/json
+      description: Get user DID when ID is given
+      parameters:
+      - description: User's ID
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: Return user DID when ID is given
+  /getPvtDatabyID:
+    get:
+      consumes:
+      - application/json
+      description: Get user DID when ID is given
+      parameters:
+      - description: User's ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PvtDataResponse'
+      summary: Return user DID when ID is given
+  /getUserIDbyDID:
+    get:
+      consumes:
+      - application/json
+      description: Get user id when DID is given
+      parameters:
+      - description: User's DID
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: Return user id when DID is given
   /login:
     post:
       consumes:
