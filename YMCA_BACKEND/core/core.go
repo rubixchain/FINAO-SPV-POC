@@ -71,8 +71,8 @@ func (c *Core) run() {
 	router.HandleFunc("/getAllPublicDataByDID", c.service.GetAllPublicDataByDID).Methods("GET")
 	router.HandleFunc("/getAllPrivateDataByDID", c.service.GetAllPrivateDataByDID).Methods("GET")
 	router.HandleFunc("/getAllAccessDatabyDID", c.service.GetAllAccessDataByDID).Methods("GET")
-	/* router.HandleFunc("/addPublicData", c.service.AddPublicData).Methods("POST")
-	router.HandleFunc("/addPublicData", c.service.AddPrivateData).Methods("POST") */
+	router.HandleFunc("/addPublicData", c.service.AddPublicData).Methods("POST")
+	router.HandleFunc("/addPublicData", c.service.AddPrivateData).Methods("POST")
 	//enable swagger
 	c.EnableSwagger(c.getURL(), router)
 	// Use the gorilla/mux router

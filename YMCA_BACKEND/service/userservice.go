@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rubixchain/FINAO-SPV-POC/YMCA_BACKEND/model"
-	"github.com/rubixchain/FINAO-SPV-POC/YMCA_BACKEND/util"
+	"YMCA_BACKEND/model"
+	"YMCA_BACKEND/util"
 
 	"github.com/gorilla/mux"
 )
