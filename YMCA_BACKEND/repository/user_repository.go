@@ -138,7 +138,7 @@ func (repo *Repository) GetPrivateDataByID(userID int) (*model.PrivateData, erro
 func (repo *Repository) GetAllAccessDataByID(userID int) ([]model.PrivateData, error) {
 	// Define the SQL query to fetch private data by DID
 	query := `
-		SELECT pd.pvt_data_id, pd.focus_area, pd.communities, pd.user_id, pd.created_at, pd.updated_at
+		SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text, pd.user_id, pd.created_at, pd.updated_at
 		FROM privatedata pd
 		INNER JOIN accesssheet as as ON pd.pvt_data_id = as.pvt_data_id
 		INNER JOIN users u ON as.decrypt_user_id = u.user_id
