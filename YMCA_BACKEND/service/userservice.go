@@ -344,8 +344,8 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} model.BasicResponse
 // @Router /getUserIDbyDID [get]
 func (s *Service) GetUserIDbyDID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	did := vars["did"]
+	/* vars := mux.Vars(r) */
+	did := r.URL.Query().Get("did")
 
 	// Query the database to fetch the user ID for the user with the given DID
 	userID, err := s.storage.GetUserIDByDID(did)
@@ -371,14 +371,14 @@ func (s *Service) GetUserIDbyDID(w http.ResponseWriter, r *http.Request) {
 // @Description Get user DID when ID is given
 // @Accept json
 // @Produce json
-// @Param did query string true "User's ID"
+// @Param user_id query int true "User's ID"
 // @Success 200 {object} model.BasicResponse
 // @Router /getDIDbyUserID [get]
 func (s *Service) GetDIDbyUserID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	userIDStr := vars["user_id"]
+	// Get the user ID from the query parameters
+	userIDStr := r.URL.Query().Get("user_id")
 
-	// Parse the user_id as an integer
+	// Parse the user ID as an integer
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
 		http.Error(w, "Invalid user_id", http.StatusBadRequest)
@@ -412,8 +412,7 @@ func (s *Service) GetDIDbyUserID(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} model.PvtDataResponse
 // @Router /getPvtDatabyID [get]
 func (s *Service) GetPvtDataByID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	userIDStr := vars["id"]
+	userIDStr := r.URL.Query().Get("user_id")
 
 	// Parse the user ID as an integer
 	userID, err := strconv.Atoi(userIDStr)

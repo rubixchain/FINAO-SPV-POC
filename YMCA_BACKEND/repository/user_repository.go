@@ -82,7 +82,7 @@ func (repo *Repository) GetPublicDataByDID(did string) (*model.PublicData, error
 		FROM public_data
 		WHERE user_id = (
 			SELECT user_id
-			FROM users
+			FROM user
 			WHERE did = ?
 		)
 		ORDER BY created_at DESC;`
@@ -116,7 +116,7 @@ func (repo *Repository) GetPrivateDataByDID(did string) (*model.PrivateData, err
 		FROM private_data
 		WHERE user_id = (
 			SELECT user_id
-			FROM users
+			FROM user
 			WHERE did = ?
 		)
 		ORDER BY created_at DESC;`
@@ -259,7 +259,8 @@ func (r *Repository) AddAccess(accessSheet *model.AccessSheet) (int, error) {
 
 func (r *Repository) GetUserIDByDID(did string) (int, error) {
 	// Define the SQL query to retrieve the user ID by DID
-	query := "SELECT user_id FROM users WHERE did = ?;"
+	r.log.Println("did ", did)
+	query := "SELECT user_id FROM user WHERE did = ?;"
 
 	var userID int
 	err := r.db.QueryRow(query, did).Scan(&userID)
@@ -272,7 +273,7 @@ func (r *Repository) GetUserIDByDID(did string) (int, error) {
 
 func (r *Repository) GetDIDByUserID(userID int) (string, error) {
 	// Define the SQL query to retrieve the DID by user ID
-	query := "SELECT did FROM users WHERE user_id = ?;"
+	query := "SELECT did FROM user WHERE user_id = ?;"
 
 	var did string
 	err := r.db.QueryRow(query, userID).Scan(&did)
