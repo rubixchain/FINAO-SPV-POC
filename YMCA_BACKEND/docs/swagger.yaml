@@ -1,4 +1,13 @@
 definitions:
+  model.AddPublicDataResponse:
+    properties:
+      message:
+        type: string
+      pub_data_id:
+        type: integer
+      status:
+        type: boolean
+    type: object
   model.BasicResponse:
     properties:
       did:
@@ -58,8 +67,6 @@ definitions:
         type: string
       cipher_text:
         type: string
-      did:
-        type: string
       user_id:
         type: integer
     type: object
@@ -75,8 +82,6 @@ definitions:
   model.PublicDataResponse:
     properties:
       communities:
-        type: string
-      did:
         type: string
       focus_area:
         type: string
@@ -157,19 +162,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.BasicResponse'
+            $ref: '#/definitions/model.AddPublicDataResponse'
       summary: add Public Data
-  /getAllAccessDatabyDID:
+  /getAllAccessDatabyID:
     get:
       consumes:
       - application/json
-      description: Get rivate data that has been given access to a  DID
+      description: Get rivate data that has been given access to a  ID
       parameters:
-      - description: User's DID
+      - description: User's ID
         in: query
-        name: did
+        name: user_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -179,18 +184,18 @@ paths:
             items:
               $ref: '#/definitions/model.PrivateDataResponse'
             type: array
-      summary: Return user private data that has been given access to a  DID
-  /getAllPrivateDataByDID:
+      summary: Return user private data that has been given access to a  ID
+  /getAllPrivateDataByID:
     get:
       consumes:
       - application/json
-      description: Get private data for a user by their DID
+      description: Get private data for a user by their ID
       parameters:
-      - description: User's DID
+      - description: User's ID
         in: query
-        name: did
+        name: user_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -198,18 +203,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.PrivateDataResponse'
-      summary: Return user private data by DID
-  /getAllPublicDataByDID:
+      summary: Return user private data by ID
+  /getAllPublicDataByID:
     get:
       consumes:
       - application/json
-      description: Get public data for a user by their DID
+      description: Get public data for a user by their ID
       parameters:
-      - description: User's DID
+      - description: User's ID
         in: query
-        name: did
+        name: user_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -217,7 +222,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.PublicDataResponse'
-      summary: Return user public data by DID
+      summary: Return user public data by ID
   /getDIDbyUserID:
     get:
       consumes:

@@ -72,27 +72,27 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.BasicResponse"
+                            "$ref": "#/definitions/model.AddPublicDataResponse"
                         }
                     }
                 }
             }
         },
-        "/getAllAccessDatabyDID": {
+        "/getAllAccessDatabyID": {
             "get": {
-                "description": "Get rivate data that has been given access to a  DID",
+                "description": "Get rivate data that has been given access to a  ID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Return user private data that has been given access to a  DID",
+                "summary": "Return user private data that has been given access to a  ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User's DID",
-                        "name": "did",
+                        "type": "integer",
+                        "description": "User's ID",
+                        "name": "user_id",
                         "in": "query",
                         "required": true
                     }
@@ -110,21 +110,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/getAllPrivateDataByDID": {
+        "/getAllPrivateDataByID": {
             "get": {
-                "description": "Get private data for a user by their DID",
+                "description": "Get private data for a user by their ID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Return user private data by DID",
+                "summary": "Return user private data by ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User's DID",
-                        "name": "did",
+                        "type": "integer",
+                        "description": "User's ID",
+                        "name": "user_id",
                         "in": "query",
                         "required": true
                     }
@@ -139,21 +139,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/getAllPublicDataByDID": {
+        "/getAllPublicDataByID": {
             "get": {
-                "description": "Get public data for a user by their DID",
+                "description": "Get public data for a user by their ID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Return user public data by DID",
+                "summary": "Return user public data by ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User's DID",
-                        "name": "did",
+                        "type": "integer",
+                        "description": "User's ID",
+                        "name": "user_id",
                         "in": "query",
                         "required": true
                     }
@@ -319,6 +319,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.AddPublicDataResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "pub_data_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
         "model.BasicResponse": {
             "type": "object",
             "properties": {
@@ -410,9 +424,6 @@ const docTemplate = `{
                 "cipher_text": {
                     "type": "string"
                 },
-                "did": {
-                    "type": "string"
-                },
                 "user_id": {
                     "type": "integer"
                 }
@@ -436,9 +447,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "communities": {
-                    "type": "string"
-                },
-                "did": {
                     "type": "string"
                 },
                 "focus_area": {
