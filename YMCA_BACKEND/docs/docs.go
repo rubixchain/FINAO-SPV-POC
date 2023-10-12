@@ -180,9 +180,9 @@ const docTemplate = `{
                 "summary": "Return user DID when ID is given",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "User's ID",
-                        "name": "did",
+                        "name": "user_id",
                         "in": "query",
                         "required": true
                     }

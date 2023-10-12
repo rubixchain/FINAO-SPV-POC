@@ -226,9 +226,9 @@ paths:
       parameters:
       - description: User's ID
         in: query
-        name: did
+        name: user_id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
