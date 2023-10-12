@@ -71,14 +71,12 @@ type PublicDataResponse struct {
 	FocusArea   string `json:"focus_area" db:"focus_area"`
 	Communities string `json:"communities" db:"communities"`
 	UserID      int    `json:"user_id" db:"user_id"`
-	DID         string `db:"did" json:"did"`
 }
 
 type PrivateDataResponse struct {
 	Capsule    string `json:"capsule" db:"capsule"`
 	CipherText string `json:"cipher_text" db:"cipher_text"`
 	UserID     int    `json:"user_id" db:"user_id"`
-	DID        string `db:"did" json:"did"`
 }
 
 type PublicDataInputReq struct {
@@ -95,9 +93,16 @@ type PrivateDataInputReq struct {
 }
 
 type AddPrivateDataResponse struct {
-	Status   bool   `json:"status"`
-	Message  string `json:"message"`
-	AccessID int    `json:"access_id"`
+	Status    bool   `json:"status"`
+	Message   string `json:"message"`
+	PvtDataID int    `json:"pvt_data_id" `
+	AccessID  int    `json:"access_id"`
+}
+
+type AddPublicDataResponse struct {
+	Status    bool   `json:"status"`
+	Message   string `json:"message"`
+	PubDataID int    `json:"pub_data_id"`
 }
 
 type BasicResponse struct {

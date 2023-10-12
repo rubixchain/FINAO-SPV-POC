@@ -68,9 +68,9 @@ func (c *Core) run() {
 	// Register API handlers using gorilla/mux
 	router.HandleFunc("/signup", c.service.SignUp).Methods("POST")
 	router.HandleFunc("/login", c.service.LogIn).Methods("POST")
-	router.HandleFunc("/getAllPublicDataByDID", c.service.GetAllPublicDataByDID).Methods("GET")
-	router.HandleFunc("/getAllPrivateDataByDID", c.service.GetAllPrivateDataByDID).Methods("GET")
-	router.HandleFunc("/getAllAccessDatabyDID", c.service.GetAllAccessDataByDID).Methods("GET")
+	router.HandleFunc("/getAllPublicDataByID", c.service.GetAllPublicDataByID).Methods("GET")
+	router.HandleFunc("/getAllPrivateDataByID", c.service.GetAllPrivateDataByID).Methods("GET")
+	router.HandleFunc("/getAllAccessDatabyID", c.service.GetAllAccessDataByID).Methods("GET")
 	router.HandleFunc("/addPublicData", c.service.AddPublicData).Methods("POST")
 	router.HandleFunc("/addPrivateData", c.service.AddPrivateData).Methods("POST")
 	router.HandleFunc("/getUserIDbyDID", c.service.GetUserIDbyDID).Methods("GET")

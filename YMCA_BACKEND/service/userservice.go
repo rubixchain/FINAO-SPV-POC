@@ -9,8 +9,6 @@ import (
 
 	"YMCA_BACKEND/model"
 	"YMCA_BACKEND/util"
-
-	"github.com/gorilla/mux"
 )
 
 // signup Return user data
@@ -140,20 +138,26 @@ func (s *Service) LogIn(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// @Summary Return user public data by DID
-// @Description Get public data for a user by their DID
+// @Summary Return user public data by ID
+// @Description Get public data for a user by their ID
 // @Accept json
 // @Produce json
-// @Param did query string true "User's DID"
+// @Param user_id query int true "User's ID"
 // @Success 200 {object} model.PublicDataResponse
-// @Router /getAllPublicDataByDID [get]
-func (s *Service) GetAllPublicDataByDID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	did := vars["did"]
+// @Router /getAllPublicDataByID [get]
+func (s *Service) GetAllPublicDataByID(w http.ResponseWriter, r *http.Request) {
+	userIDStr := r.URL.Query().Get("user_id")
+
+	// Parse the user ID as an integer
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		http.Error(w, "Invalid user_id", http.StatusBadRequest)
+		return
+	}
 
 	// TODO: Query the database to fetch public data for the user with the given DID
 	// Replace the following line with your database query logic
-	publicData, err := s.storage.GetPublicDataByDID(did)
+	publicData, err := s.storage.GetPublicDataByID(userID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -165,27 +169,32 @@ func (s *Service) GetAllPublicDataByDID(w http.ResponseWriter, r *http.Request) 
 		FocusArea:   publicData.FocusArea,
 		Communities: publicData.Communities,
 		UserID:      publicData.UserID,
-		DID:         did,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-// @Summary Return user private data by DID
-// @Description Get private data for a user by their DID
+// @Summary Return user private data by ID
+// @Description Get private data for a user by their ID
 // @Accept json
 // @Produce json
-// @Param did query string true "User's DID"
+// @Param user_id query int true "User's ID"
 // @Success 200 {object} model.PrivateDataResponse
-// @Router /getAllPrivateDataByDID [get]
-func (s *Service) GetAllPrivateDataByDID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	did := vars["did"]
+// @Router /getAllPrivateDataByID [get]
+func (s *Service) GetAllPrivateDataByID(w http.ResponseWriter, r *http.Request) {
+	userIDStr := r.URL.Query().Get("user_id")
+
+	// Parse the user ID as an integer
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		http.Error(w, "Invalid user_id", http.StatusBadRequest)
+		return
+	}
 
 	// TODO: Query the database to fetch public data for the user with the given DID
 	// Replace the following line with your database query logic
-	privateData, err := s.storage.GetPrivateDataByDID(did)
+	privateData, err := s.storage.GetPrivateDataByID(userID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -197,26 +206,31 @@ func (s *Service) GetAllPrivateDataByDID(w http.ResponseWriter, r *http.Request)
 		Capsule:    privateData.Capsule,
 		CipherText: privateData.CipherText,
 		UserID:     privateData.UserID,
-		DID:        did,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-// @Summary Return user private data that has been given access to a  DID
-// @Description Get rivate data that has been given access to a  DID
+// @Summary Return user private data that has been given access to a  ID
+// @Description Get rivate data that has been given access to a  ID
 // @Accept json
 // @Produce json
-// @Param did query string true "User's DID"
+// @Param user_id query int true "User's ID"
 // @Success 200 {object} []model.PrivateDataResponse
-// @Router /getAllAccessDatabyDID [get]
-func (s *Service) GetAllAccessDataByDID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	did := vars["did"]
+// @Router /getAllAccessDatabyID [get]
+func (s *Service) GetAllAccessDataByID(w http.ResponseWriter, r *http.Request) {
+	userIDStr := r.URL.Query().Get("user_id")
+
+	// Parse the user ID as an integer
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		http.Error(w, "Invalid user_id", http.StatusBadRequest)
+		return
+	}
 
 	// Query the database to fetch private data for the user with the given DID
-	privateDataList, err := s.storage.GetAllAccessDataByDID(did)
+	privateDataList, err := s.storage.GetAllAccessDataByID(userID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -232,7 +246,6 @@ func (s *Service) GetAllAccessDataByDID(w http.ResponseWriter, r *http.Request) 
 			Capsule:    privateData.Capsule,
 			CipherText: privateData.CipherText,
 			UserID:     privateData.UserID,
-			DID:        did,
 		}
 		responseList = append(responseList, response)
 	}
@@ -247,7 +260,7 @@ func (s *Service) GetAllAccessDataByDID(w http.ResponseWriter, r *http.Request) 
 // @Accept json
 // @Produce json
 // @Param user body model.PublicDataInputReq true "enter details"
-// @Success 200 {object} model.BasicResponse
+// @Success 200 {object} model.AddPublicDataResponse
 // @Router /addPublicData [post]
 func (s *Service) AddPublicData(w http.ResponseWriter, r *http.Request) {
 	var addPubDataReq model.PublicDataInputReq
@@ -258,7 +271,7 @@ func (s *Service) AddPublicData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := &model.BasicResponse{
+	res := &model.AddPublicDataResponse{
 		Status: false,
 	}
 	pubData := &model.PublicData{
@@ -266,13 +279,14 @@ func (s *Service) AddPublicData(w http.ResponseWriter, r *http.Request) {
 		Communities: addPubDataReq.Communities,
 		UserID:      addPubDataReq.UserID,
 	}
-	err := s.storage.AddPublicData(pubData)
+	pubDataID, err := s.storage.AddPublicData(pubData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	res.Status = true
 	res.Message = "Public data added successfully"
+	res.PubDataID = pubDataID
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
