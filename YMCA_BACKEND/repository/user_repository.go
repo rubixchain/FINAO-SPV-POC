@@ -140,8 +140,8 @@ func (repo *Repository) GetAllAccessDataByID(userID int) ([]model.PrivateData, e
 	query := `
 		SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text, pd.user_id, pd.created_at, pd.updated_at
 		FROM privatedata pd
-		INNER JOIN accesssheet as as ON pd.pvt_data_id = as.pvt_data_id
-		INNER JOIN users u ON as.decrypt_user_id = u.user_id
+		INNER JOIN accesssheet as acs ON pd.pvt_data_id = acs.pvt_data_id
+		INNER JOIN users u ON acs.decrypt_user_id = u.user_id
 		WHERE u.user_id = ?;`
 
 	// Execute the query and retrieve the private data
