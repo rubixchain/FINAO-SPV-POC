@@ -341,6 +341,7 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 	res.Status = true
 	res.Message = "Private data added successfully, Access to Pvt data given"
 	res.AccessID = accessID
+	res.PvtDataID = pvtDataId
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

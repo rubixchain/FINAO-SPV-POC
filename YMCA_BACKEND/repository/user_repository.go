@@ -140,7 +140,7 @@ func (repo *Repository) GetAllAccessDataByID(userID int) ([]model.PrivateData, e
 	query := `
 		SELECT pd.pvt_data_id, pd.focus_area, pd.communities, pd.user_id, pd.created_at, pd.updated_at
 		FROM privatedata pd
-		INNER JOIN access_sheet as as ON pd.pvt_data_id = as.pvt_data_id
+		INNER JOIN accesssheet as as ON pd.pvt_data_id = as.pvt_data_id
 		INNER JOIN users u ON as.decrypt_user_id = u.user_id
 		WHERE u.user_id = ?;`
 
@@ -229,13 +229,14 @@ func (r *Repository) AddPrivateData(data *model.PrivateData) (int, error) {
 		return 0, err
 	}
 
+	r.log.Println("pvtDataID ", pvtDataID)
 	return int(pvtDataID), nil
 }
 
 func (r *Repository) AddAccess(accessSheet *model.AccessSheet) (int, error) {
 	// Define the SQL query to insert an access sheet entry
 	query := `
-		INSERT INTO access_sheet (pvt_data_id, decrypt_user_id)
+		INSERT INTO accesssheet (pvt_data_id, decrypt_user_id)
 		VALUES (?, ?);
 	`
 
@@ -285,8 +286,8 @@ func (r *Repository) GetPvtDataByUserID(userID int) ([]model.PrivateData, error)
 	// Define the SQL query to fetch private data by user ID
 	query := `
         SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text
-        FROM private_data pd
-        INNER JOIN access_sheet as ON pd.pvt_data_id = as.pvt_data_id
+        FROM privatedata pd
+        INNER JOIN accesssheet as ON pd.pvt_data_id = as.pvt_data_id
         WHERE as.decrypt_user_id = ?;`
 
 	// Execute the query and retrieve the private data
