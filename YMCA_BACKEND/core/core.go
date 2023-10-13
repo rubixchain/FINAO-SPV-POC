@@ -79,6 +79,9 @@ func (c *Core) run() {
 	router.HandleFunc("/getUserIDbyDID", c.service.GetUserIDbyDID).Methods("GET")
 	router.HandleFunc("/getDIDbyUserID", c.service.GetDIDbyUserID).Methods("GET")
 	router.HandleFunc("/getPvtDataByID", c.service.GetPvtDataByID).Methods("GET")
+	router.HandleFunc("/api/v1/generate-smart-contract", c.service.GenerateSmartContract).Methods("POST")
+	router.HandleFunc("/api/v1/deploy-smart-contract", c.service.DeploySmartContract).Methods("POST")
+	router.HandleFunc("/api/v1/execute-smart-contract", c.service.ExecuteSmartContract).Methods("POST")
 	//enable swagger
 	c.EnableSwagger(c.getURL(), router)
 	// Use the gorilla/mux router
