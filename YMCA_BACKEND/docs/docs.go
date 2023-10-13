@@ -401,14 +401,14 @@ const docTemplate = `{
         "model.PrivateDataInputReq": {
             "type": "object",
             "properties": {
-                "capsule": {
-                    "type": "string"
-                },
-                "cipher_text": {
+                "communities": {
                     "type": "string"
                 },
                 "decrypt_user_id": {
                     "type": "integer"
+                },
+                "focus_area": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "integer"
