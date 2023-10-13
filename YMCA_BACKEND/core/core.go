@@ -57,6 +57,9 @@ func (c *Core) run() {
 	if err := c.storage.CreateTable(model.AccessSheet{}); err != nil {
 		c.log.Fatalf("failed to create table: %v", err)
 	}
+	if err := c.storage.CreateTable(model.SecretKeyData{}); err != nil {
+		c.log.Fatalf("failed to create table: %v", err)
+	}
 
 	corsHandler := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:8080"}),
