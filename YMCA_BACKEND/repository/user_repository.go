@@ -319,3 +319,32 @@ func (r *Repository) GetPvtDataByUserID(userID int) ([]model.PrivateData, error)
 
 	return privateDataList, nil
 }
+
+func (r *Repository) AddSecretKeys(secretKeyData model.SecretKeyData) error {
+
+	query := "INSERT INTO secretkeydata (secret_key, public_key, user_id) VALUES (?, ?, ?)"
+	_, err := r.db.Exec(query, secretKeyData.SecretKey, secretKeyData.PublicKey, secretKeyData.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) GetKeyDetails(userID int) (model.SecretKeyData, error) {
+	var keyDetails model.SecretKeyData
+	query := "SELECT * FROM secretkeydata WHERE user_id = ?"
+
+	err := r.db.QueryRow(query, userID).Scan(
+		&keyDetails.KeyID,
+		&keyDetails.SecretKey,
+		&keyDetails.PublicKey,
+		&keyDetails.UserID,
+	)
+
+	if err != nil {
+		return model.SecretKeyData{}, err
+	}
+
+	return keyDetails, nil
+}
