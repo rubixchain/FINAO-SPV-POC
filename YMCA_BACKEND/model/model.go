@@ -86,10 +86,15 @@ type PublicDataInputReq struct {
 }
 
 type PrivateDataInputReq struct {
-	Capsule       string `json:"capsule" db:"capsule"`
-	CipherText    string `json:"cipher_text" db:"cipher_text"`
+	FocusArea     string `json:"focus_area" db:"focus_area"`
+	Communities   string `json:"communities" db:"communities"`
 	UserID        int    `json:"user_id" db:"user_id foreignkey"`
 	DecryptUserID int    `json:"decrypt_user_id" db:"decrypt_user_id"`
+}
+
+type PrivateDataEncrypt struct {
+	FocusArea   string `json:"focus_area" db:"focus_area"`
+	Communities string `json:"communities" db:"communities"`
 }
 
 type AddPrivateDataResponse struct {
@@ -116,4 +121,26 @@ type PvtDataResponse struct {
 	Status      bool          `json:"status"`
 	Message     string        `json:"message"`
 	PrivateData []PrivateData `json:"privateData"`
+}
+
+type SecretKeys struct {
+	SecretKey string `json:"secretKey"`
+	PublicKey string `json:"publicKey"`
+}
+
+type SecretKeyData struct {
+	KeyID     int    `json:"key_id" db:"key_id primarykey"`
+	SecretKey string `json:"secretKey" db:"secret_key"`
+	PublicKey string `json:"publicKey" db:"public_key"`
+	UserID    int    `json:"user_id" db:"user_id foreignkey"`
+}
+
+type EncryptionRequest struct {
+	PublicKey string `json:"public_key"`
+	Plaintext string `json:"plaintext"`
+}
+
+type EncryptionResponse struct {
+	Capsule    string `json:"capsule"`
+	Ciphertext string `json:"ciphertext"`
 }
