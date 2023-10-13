@@ -92,6 +92,26 @@ func (s *Service) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	}()
 
+	go func() {
+		secretKeys, err := util.GenerateSecretKeys()
+		if err != nil {
+			// Handle errors from createDID if needed
+			s.log.Println("Error creating Keys:", err)
+		} else {
+			s.log.Println("Keys created successfully for user ID", userID)
+			// You can take further actions based on the result here
+		}
+		secretKeysData := model.SecretKeyData{
+			SecretKey: secretKeys.SecretKey,
+			PublicKey: secretKeys.PublicKey,
+			UserID:    userID,
+		}
+		err = s.storage.AddSecretKeys(secretKeysData)
+		if err != nil {
+			s.log.Println("Failed to add keys for user ", userID)
+		}
+	}()
+
 }
 
 // login Return user data
@@ -316,7 +336,7 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 	res := &model.AddPrivateDataResponse{
 		Status: false,
 	}
-	pvtData := &model.PrivateData{
+	/* pvtData := &model.PrivateData{
 		Capsule:    addPvtDataReq.Capsule,
 		CipherText: addPvtDataReq.CipherText,
 		UserID:     addPvtDataReq.UserID,
@@ -341,7 +361,61 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 	res.Status = true
 	res.Message = "Private data added successfully, Access to Pvt data given"
 	res.AccessID = accessID
-	res.PvtDataID = pvtDataId
+	res.PvtDataID = pvtDataId */
+
+	privateDataEncrypt := model.PrivateDataEncrypt{
+		FocusArea:   addPvtDataReq.FocusArea,
+		Communities: addPvtDataReq.Communities,
+	}
+
+	privateDataStr, err := util.CombinePrivateData(privateDataEncrypt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	userIDs := make([]int, 0)
+	userIDs = append(userIDs, addPvtDataReq.UserID)
+	userIDs = append(userIDs, addPvtDataReq.DecryptUserID)
+
+	for userID := range userIDs {
+		secretKeys, err := s.storage.GetKeyDetails(userID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		encryptionResponse, err := util.EncryptData(secretKeys.PublicKey, privateDataStr)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		pvtData := &model.PrivateData{
+			Capsule:    encryptionResponse.Capsule,
+			CipherText: encryptionResponse.Ciphertext,
+			UserID:     userID,
+		}
+		pvtDataId, err := s.storage.AddPrivateData(pvtData)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		accessDataMap := &model.AccessSheet{
+			PvtDataID:     pvtDataId,
+			DecryptUserID: userID,
+		}
+
+		accessID, err := s.storage.AddAccess(accessDataMap)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		res.Status = true
+		res.Message = "Private data added successfully, Access to Pvt data given"
+		res.AccessID = accessID
+		res.PvtDataID = pvtDataId
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
