@@ -333,6 +333,7 @@ func (r *Repository) AddSecretKeys(secretKeyData model.SecretKeyData) error {
 
 func (r *Repository) GetKeyDetails(userID int) (model.SecretKeyData, error) {
 	var keyDetails model.SecretKeyData
+	//r.log.Println(userID)
 	query := "SELECT * FROM secretkeydata WHERE user_id = ?"
 
 	err := r.db.QueryRow(query, userID).Scan(
@@ -343,6 +344,7 @@ func (r *Repository) GetKeyDetails(userID int) (model.SecretKeyData, error) {
 	)
 
 	if err != nil {
+		r.log.Println(err)
 		return model.SecretKeyData{}, err
 	}
 

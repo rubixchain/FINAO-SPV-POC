@@ -374,11 +374,15 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* s.log.Println(addPvtDataReq.UserID)
+	s.log.Println(addPvtDataReq.DecryptUserID) */
+
 	userIDs := make([]int, 0)
 	userIDs = append(userIDs, addPvtDataReq.UserID)
 	userIDs = append(userIDs, addPvtDataReq.DecryptUserID)
 
-	for userID := range userIDs {
+	for _, userID := range userIDs {
+		//s.log.Println(userID)
 		secretKeys, err := s.storage.GetKeyDetails(userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
