@@ -121,6 +121,64 @@ definitions:
       userID:
         type: integer
     type: object
+  service.DeploySmartContractInput:
+    properties:
+      comment:
+        type: string
+      deployerAddress:
+        type: string
+      port:
+        type: string
+      quorumType:
+        type: integer
+      rbtAmount:
+        type: integer
+      smartContractToken:
+        type: string
+    type: object
+  service.ExecuteSmartContractInput:
+    properties:
+      comment:
+        type: string
+      executorAddress:
+        type: string
+      port:
+        type: string
+      quorumType:
+        type: integer
+      smartContractData:
+        type: string
+      smartContractToken:
+        type: string
+    type: object
+  service.RubixResponse:
+    properties:
+      message:
+        type: string
+      result: {}
+      status:
+        type: boolean
+    type: object
+  service.SmartContractInput:
+    properties:
+      binaryCodePath:
+        type: string
+      did:
+        type: string
+      port:
+        type: string
+      rawCodePath:
+        type: string
+      schemaFilePath:
+        type: string
+    type: object
+  service.SubscribeContractRequest:
+    properties:
+      contract:
+        type: string
+      port:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -164,6 +222,89 @@ paths:
           schema:
             $ref: '#/definitions/model.AddPublicDataResponse'
       summary: add Public Data
+  /api/v1/deploy-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to deploy the smart contract token and token
+        chain to the network.
+      parameters:
+      - description: Give the input
+        in: body
+        name: smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.DeploySmartContractInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function deploys the smart contract token
+  /api/v1/execute-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to execute the smart contract. When a smart
+        contract is executed the tokenchain is updated, this updation happens here.
+      parameters:
+      - description: Give the input
+        in: body
+        name: smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.ExecuteSmartContractInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function update the token chain
+  /api/v1/generate-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to generate the smart contract token and
+        the genesis block of the tokenchain
+      parameters:
+      - description: Give the input
+        in: body
+        name: smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.SmartContractInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function generates the smart contract token
+  /api/v1/subscribe-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to subscribe the smart contract.
+      parameters:
+      - description: Give the input
+        in: body
+        name: subscribe_smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.SubscribeContractRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function subscribes the smart contract
   /getAllAccessDatabyID:
     get:
       consumes:

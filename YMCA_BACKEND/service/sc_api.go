@@ -52,6 +52,19 @@ type GetSmartContractDataInput struct {
 	Token string `json:"token"`
 }
 
+type SubscribeContractRequest struct {
+	SmartContractToken string `json:"contract"`
+	Port               string `json:"port"`
+}
+
+// generate-smart-contract
+// @Summary This function generates the smart contract token
+// @Description This endpoint is used to generate the smart contract token and the genesis block of the tokenchain
+// @Accept json
+// @Produce json
+// @Param smart_contract_input body service.SmartContractInput true "Give the input"
+// @Success 200 {object} service.RubixResponse
+// @Router /api/v1/generate-smart-contract [post]
 func GenerateSmartContract(w http.ResponseWriter, r *http.Request) {
 	var inputReq SmartContractInput
 	err1 := json.NewDecoder(r.Body).Decode(&inputReq) //decode request into struct
@@ -122,6 +135,14 @@ func GenerateSmartContract(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// deploy-smart-contract
+// @Summary This function deploys the smart contract token
+// @Description This endpoint is used to deploy the smart contract token and token chain to the network.
+// @Accept json
+// @Produce json
+// @Param smart_contract_input body service.DeploySmartContractInput true "Give the input"
+// @Success 200 {object} service.RubixResponse
+// @Router /api/v1/deploy-smart-contract [post]
 func DeploySmartContract(w http.ResponseWriter, r *http.Request) {
 	var inputReq DeploySmartContractInput
 	err1 := json.NewDecoder(r.Body).Decode(&inputReq) //decode request into struct
@@ -185,6 +206,14 @@ func DeploySmartContract(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(finalResponse)
 }
 
+// execute-smart-contract
+// @Summary This function update the token chain
+// @Description This endpoint is used to execute the smart contract. When a smart contract is executed the tokenchain is updated, this updation happens here.
+// @Accept json
+// @Produce json
+// @Param smart_contract_input body service.ExecuteSmartContractInput true "Give the input"
+// @Success 200 {object} service.RubixResponse
+// @Router /api/v1/execute-smart-contract [post]
 func ExecuteSmartContract(w http.ResponseWriter, r *http.Request) {
 	var inputReq ExecuteSmartContractInput
 	err1 := json.NewDecoder(r.Body).Decode(&inputReq) //decode request into struct
@@ -247,6 +276,74 @@ func ExecuteSmartContract(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(finalResponse)
 
 	defer resp.Body.Close()
+
+}
+
+// subscribe-smart-contract
+// @Summary This function subscribes the smart contract
+// @Description This endpoint is used to subscribe the smart contract.
+// @Accept json
+// @Produce json
+// @Param subscribe_smart_contract_input body service.SubscribeContractRequest true "Give the input"
+// @Success 200 {object} service.RubixResponse
+// @Router /api/v1/subscribe-smart-contract [post]
+func SubscribeSmartContract(w http.ResponseWriter, r *http.Request) {
+	var inputReq SubscribeContractRequest
+	err1 := json.NewDecoder(r.Body).Decode(&inputReq) //decode request into struct
+	if err1 != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Printf("Error reading response body: %s\n", err1)
+		return
+	}
+	data := map[string]interface{}{
+		"contract": inputReq.SmartContractToken,
+	}
+	bodyJSON, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
+		return
+	}
+	url := fmt.Sprintf("http://localhost:%s/api/subscribe-contract", inputReq.Port)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(bodyJSON))
+	if err != nil {
+		fmt.Println("Error creating HTTP request:", err)
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending HTTP request:", err)
+		return
+	}
+	fmt.Println("Response Status:", resp.Status)
+	data2, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Error reading response body: %s\n", err)
+		return
+	}
+	// Process the data as needed
+	fmt.Println("Response Body in subscribe smart contract :", string(data2))
+
+	defer resp.Body.Close()
+	var response RubixResponse
+	if err != nil {
+		fmt.Printf("Error reading response body: %s\n", err)
+		return
+	}
+	err2 := json.Unmarshal([]byte(data2), &response)
+	if err2 != nil {
+		fmt.Println("Error:", err2)
+		return
+	}
+
+	// Process the data as needed
+	fmt.Println("Response Body in Generate Smart Contract :", string(data2))
+
+	// Process the response as needed
+	json.NewEncoder(w).Encode(response)
 
 }
 
