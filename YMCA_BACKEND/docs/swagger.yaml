@@ -1,4 +1,24 @@
 definitions:
+  model.AddPublicDataResponse:
+    properties:
+      message:
+        type: string
+      pub_data_id:
+        type: integer
+      status:
+        type: boolean
+    type: object
+  model.BasicResponse:
+    properties:
+      did:
+        type: string
+      message:
+        type: string
+      status:
+        type: boolean
+      userID:
+        type: integer
+    type: object
   model.LogInRequest:
     properties:
       email:
@@ -14,6 +34,70 @@ definitions:
         type: boolean
       userID:
         type: integer
+    type: object
+  model.PrivateData:
+    properties:
+      capsule:
+        type: string
+      cipher_text:
+        type: string
+      created_at:
+        type: string
+      pvt_data_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PrivateDataInputReq:
+    properties:
+      communities:
+        type: string
+      decrypt_user_id:
+        type: integer
+      focus_area:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PrivateDataResponse:
+    properties:
+      capsule:
+        type: string
+      cipher_text:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PublicDataInputReq:
+    properties:
+      communities:
+        type: string
+      focus_area:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PublicDataResponse:
+    properties:
+      communities:
+        type: string
+      focus_area:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.PvtDataResponse:
+    properties:
+      message:
+        type: string
+      privateData:
+        items:
+          $ref: '#/definitions/model.PrivateData'
+        type: array
+      status:
+        type: boolean
     type: object
   model.SignUpRequest:
     properties:
@@ -37,9 +121,306 @@ definitions:
       userID:
         type: integer
     type: object
+  service.DeploySmartContractInput:
+    properties:
+      comment:
+        type: string
+      deployerAddress:
+        type: string
+      port:
+        type: string
+      quorumType:
+        type: integer
+      rbtAmount:
+        type: integer
+      smartContractToken:
+        type: string
+    type: object
+  service.ExecuteSmartContractInput:
+    properties:
+      comment:
+        type: string
+      executorAddress:
+        type: string
+      port:
+        type: string
+      quorumType:
+        type: integer
+      smartContractData:
+        type: string
+      smartContractToken:
+        type: string
+    type: object
+  service.RubixResponse:
+    properties:
+      message:
+        type: string
+      result: {}
+      status:
+        type: boolean
+    type: object
+  service.SmartContractInput:
+    properties:
+      binaryCodePath:
+        type: string
+      did:
+        type: string
+      port:
+        type: string
+      rawCodePath:
+        type: string
+      schemaFilePath:
+        type: string
+    type: object
+  service.SubscribeContractRequest:
+    properties:
+      contract:
+        type: string
+      port:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
+  /addPrivateData:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to add Private Data
+      parameters:
+      - description: enter the details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.PrivateDataInputReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: add Private Data
+  /addPublicData:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to add Public Data
+      parameters:
+      - description: enter details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.PublicDataInputReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AddPublicDataResponse'
+      summary: add Public Data
+  /api/v1/deploy-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to deploy the smart contract token and token
+        chain to the network.
+      parameters:
+      - description: Give the input
+        in: body
+        name: smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.DeploySmartContractInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function deploys the smart contract token
+  /api/v1/execute-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to execute the smart contract. When a smart
+        contract is executed the tokenchain is updated, this updation happens here.
+      parameters:
+      - description: Give the input
+        in: body
+        name: smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.ExecuteSmartContractInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function update the token chain
+  /api/v1/generate-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to generate the smart contract token and
+        the genesis block of the tokenchain
+      parameters:
+      - description: Give the input
+        in: body
+        name: smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.SmartContractInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function generates the smart contract token
+  /api/v1/subscribe-smart-contract:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint is used to subscribe the smart contract.
+      parameters:
+      - description: Give the input
+        in: body
+        name: subscribe_smart_contract_input
+        required: true
+        schema:
+          $ref: '#/definitions/service.SubscribeContractRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RubixResponse'
+      summary: This function subscribes the smart contract
+  /getAllAccessDatabyID:
+    get:
+      consumes:
+      - application/json
+      description: Get rivate data that has been given access to a  ID
+      parameters:
+      - description: User's ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.PrivateDataResponse'
+            type: array
+      summary: Return user private data that has been given access to a  ID
+  /getAllPrivateDataByID:
+    get:
+      consumes:
+      - application/json
+      description: Get private data for a user by their ID
+      parameters:
+      - description: User's ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PrivateDataResponse'
+      summary: Return user private data by ID
+  /getAllPublicDataByID:
+    get:
+      consumes:
+      - application/json
+      description: Get public data for a user by their ID
+      parameters:
+      - description: User's ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PublicDataResponse'
+      summary: Return user public data by ID
+  /getDIDbyUserID:
+    get:
+      consumes:
+      - application/json
+      description: Get user DID when ID is given
+      parameters:
+      - description: User's ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: Return user DID when ID is given
+  /getPvtDatabyID:
+    get:
+      consumes:
+      - application/json
+      description: Get user DID when ID is given
+      parameters:
+      - description: User's ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PvtDataResponse'
+      summary: Return user DID when ID is given
+  /getUserIDbyDID:
+    get:
+      consumes:
+      - application/json
+      description: Get user id when DID is given
+      parameters:
+      - description: User's DID
+        in: query
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BasicResponse'
+      summary: Return user id when DID is given
   /login:
     post:
       consumes:

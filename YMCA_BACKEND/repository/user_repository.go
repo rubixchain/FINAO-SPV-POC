@@ -75,21 +75,17 @@ func (repository *Repository) UpdateUserDID(userID int, did string) error {
 }
 
 // GetPublicDataByDID fetches the public data of a user by their DID, sorted by created time in descending order.
-func (repo *Repository) GetPublicDataByDID(did string) (*model.PublicData, error) {
+func (repo *Repository) GetPublicDataByID(userID int) (*model.PublicData, error) {
 	// Define the SQL query to fetch public data by DID and sort by created time in descending order
 	query := `
 		SELECT pub_data_id, focus_area, communities, user_id, created_at, updated_at
-		FROM public_data
-		WHERE user_id = (
-			SELECT user_id
-			FROM users
-			WHERE did = ?
-		)
+		FROM publicdata
+		WHERE user_id = ?
 		ORDER BY created_at DESC;`
 
 	// Execute the query and retrieve the public data
 	var publicData model.PublicData
-	err := repo.db.QueryRow(query, did).Scan(
+	err := repo.db.QueryRow(query, userID).Scan(
 		&publicData.PubDataID,
 		&publicData.FocusArea,
 		&publicData.Communities,
@@ -100,7 +96,7 @@ func (repo *Repository) GetPublicDataByDID(did string) (*model.PublicData, error
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("public data not found for DID: %s", did)
+			return nil, fmt.Errorf("public data not found for user ID: %s", userID)
 		}
 		return nil, err
 	}
@@ -109,21 +105,17 @@ func (repo *Repository) GetPublicDataByDID(did string) (*model.PublicData, error
 }
 
 // GetPrivateataByDID fetches the public data of a user by their DID, sorted by created time in descending order.
-func (repo *Repository) GetPrivateDataByDID(did string) (*model.PrivateData, error) {
+func (repo *Repository) GetPrivateDataByID(userID int) (*model.PrivateData, error) {
 	// Define the SQL query to fetch public data by DID and sort by created time in descending order
 	query := `
 		SELECT pvt_data_id, focus_area, communities, user_id, created_at, updated_at
-		FROM private_data
-		WHERE user_id = (
-			SELECT user_id
-			FROM users
-			WHERE did = ?
-		)
+		FROM privatedata
+		WHERE user_id = ?
 		ORDER BY created_at DESC;`
 
 	// Execute the query and retrieve the public data
 	var privateData model.PrivateData
-	err := repo.db.QueryRow(query, did).Scan(
+	err := repo.db.QueryRow(query, userID).Scan(
 		&privateData.PvtDataID,
 		&privateData.Capsule,
 		&privateData.CipherText,
@@ -134,7 +126,7 @@ func (repo *Repository) GetPrivateDataByDID(did string) (*model.PrivateData, err
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("public data not found for DID: %s", did)
+			return nil, fmt.Errorf("public data not found for userID : %s", userID)
 		}
 		return nil, err
 	}
@@ -143,17 +135,17 @@ func (repo *Repository) GetPrivateDataByDID(did string) (*model.PrivateData, err
 }
 
 // GetAllAccessDataByDID retrieves private data by DID.
-func (repo *Repository) GetAllAccessDataByDID(did string) ([]model.PrivateData, error) {
+func (repo *Repository) GetAllAccessDataByID(userID int) ([]model.PrivateData, error) {
 	// Define the SQL query to fetch private data by DID
 	query := `
-		SELECT pd.pvt_data_id, pd.focus_area, pd.communities, pd.user_id, pd.created_at, pd.updated_at
-		FROM private_data pd
-		INNER JOIN access_sheet as as ON pd.pvt_data_id = as.pvt_data_id
-		INNER JOIN users u ON as.decrypt_user_id = u.user_id
-		WHERE u.did = ?;`
+		SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text, pd.user_id, pd.created_at, pd.updated_at
+		FROM privatedata pd
+		INNER JOIN accesssheet as acs ON pd.pvt_data_id = acs.pvt_data_id
+		INNER JOIN users u ON acs.decrypt_user_id = u.user_id
+		WHERE u.user_id = ?;`
 
 	// Execute the query and retrieve the private data
-	rows, err := repo.db.Query(query, did)
+	rows, err := repo.db.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -183,4 +175,178 @@ func (repo *Repository) GetAllAccessDataByDID(did string) ([]model.PrivateData, 
 	}
 
 	return privateDataList, nil
+}
+
+// AddPublicData inserts a new public data entry into the PublicData table.
+func (r *Repository) AddPublicData(data *model.PublicData) (int, error) {
+	// Define the SQL query to insert a new public data entry.
+	query := `
+        INSERT INTO publicdata (focus_area, communities, user_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+    `
+
+	// Execute the SQL query to insert the new public data entry.
+	result, err := r.db.Exec(
+		query,
+		data.FocusArea,
+		data.Communities,
+		data.UserID,
+		time.Now(), // CreatedAt
+		time.Now(), // UpdatedAt
+	)
+
+	pubDataID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(pubDataID), nil
+}
+
+// AddPrivateData inserts a new private data entry into the PrivateData table.
+func (r *Repository) AddPrivateData(data *model.PrivateData) (int, error) {
+	// Define the SQL query to insert a new private data entry.
+	query := `
+        INSERT INTO privatedata (capsule, cipher_text, user_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+    `
+
+	// Execute the SQL query to insert the new private data entry.
+	result, err := r.db.Exec(
+		query,
+		data.Capsule,
+		data.CipherText,
+		data.UserID,
+		time.Now(), // CreatedAt
+		time.Now(), // UpdatedAt
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	pvtDataID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	r.log.Println("pvtDataID ", pvtDataID)
+	return int(pvtDataID), nil
+}
+
+func (r *Repository) AddAccess(accessSheet *model.AccessSheet) (int, error) {
+	// Define the SQL query to insert an access sheet entry
+	query := `
+		INSERT INTO accesssheet (pvt_data_id, decrypt_user_id)
+		VALUES (?, ?);
+	`
+
+	// Execute the query to insert the access sheet entry
+	result, err := r.db.Exec(query, accessSheet.PvtDataID, accessSheet.DecryptUserID)
+	if err != nil {
+		return 0, err
+	}
+
+	// Retrieve the last inserted ID (access ID)
+	accessID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(accessID), nil
+}
+
+func (r *Repository) GetUserIDByDID(did string) (int, error) {
+	// Define the SQL query to retrieve the user ID by DID
+	r.log.Println("did ", did)
+	query := "SELECT user_id FROM user WHERE did = ?;"
+
+	var userID int
+	err := r.db.QueryRow(query, did).Scan(&userID)
+	if err != nil {
+		return 0, err
+	}
+
+	return userID, nil
+}
+
+func (r *Repository) GetDIDByUserID(userID int) (string, error) {
+	// Define the SQL query to retrieve the DID by user ID
+	query := "SELECT did FROM user WHERE user_id = ?;"
+
+	var did string
+	err := r.db.QueryRow(query, userID).Scan(&did)
+	if err != nil {
+		return "", err
+	}
+
+	return did, nil
+}
+
+func (r *Repository) GetPvtDataByUserID(userID int) ([]model.PrivateData, error) {
+	// Define the SQL query to fetch private data by user ID
+	query := `
+        SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text
+        FROM privatedata pd
+        INNER JOIN accesssheet as ON pd.pvt_data_id = as.pvt_data_id
+        WHERE as.decrypt_user_id = ?;`
+
+	// Execute the query and retrieve the private data
+	rows, err := r.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var privateDataList []model.PrivateData
+
+	// Iterate through the rows and populate the private data list
+	for rows.Next() {
+		var privateData model.PrivateData
+		err := rows.Scan(
+			&privateData.PvtDataID,
+			&privateData.Capsule,
+			&privateData.CipherText,
+		)
+		if err != nil {
+			return nil, err
+		}
+		privateDataList = append(privateDataList, privateData)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return privateDataList, nil
+}
+
+func (r *Repository) AddSecretKeys(secretKeyData model.SecretKeyData) error {
+
+	query := "INSERT INTO secretkeydata (secret_key, public_key, user_id) VALUES (?, ?, ?)"
+	_, err := r.db.Exec(query, secretKeyData.SecretKey, secretKeyData.PublicKey, secretKeyData.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) GetKeyDetails(userID int) (model.SecretKeyData, error) {
+	var keyDetails model.SecretKeyData
+	//r.log.Println(userID)
+	query := "SELECT * FROM secretkeydata WHERE user_id = ?"
+
+	err := r.db.QueryRow(query, userID).Scan(
+		&keyDetails.KeyID,
+		&keyDetails.SecretKey,
+		&keyDetails.PublicKey,
+		&keyDetails.UserID,
+	)
+
+	if err != nil {
+		r.log.Println(err)
+		return model.SecretKeyData{}, err
+	}
+
+	return keyDetails, nil
 }

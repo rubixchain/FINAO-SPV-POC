@@ -57,6 +57,9 @@ func (c *Core) run() {
 	if err := c.storage.CreateTable(model.AccessSheet{}); err != nil {
 		c.log.Fatalf("failed to create table: %v", err)
 	}
+	if err := c.storage.CreateTable(model.SecretKeyData{}); err != nil {
+		c.log.Fatalf("failed to create table: %v", err)
+	}
 
 	corsHandler := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:8080"}),
@@ -68,11 +71,18 @@ func (c *Core) run() {
 	// Register API handlers using gorilla/mux
 	router.HandleFunc("/signup", c.service.SignUp).Methods("POST")
 	router.HandleFunc("/login", c.service.LogIn).Methods("POST")
-	router.HandleFunc("/getAllPublicDataByDID", c.service.GetAllPublicDataByDID).Methods("GET")
-	router.HandleFunc("/getAllPrivateDataByDID", c.service.GetAllPrivateDataByDID).Methods("GET")
-	router.HandleFunc("/getAllAccessDatabyDID", c.service.GetAllAccessDataByDID).Methods("GET")
-	/* router.HandleFunc("/addPublicData", c.service.AddPublicData).Methods("POST")
-	router.HandleFunc("/addPublicData", c.service.AddPrivateData).Methods("POST") */
+	router.HandleFunc("/getAllPublicDataByID", c.service.GetAllPublicDataByID).Methods("GET")
+	router.HandleFunc("/getAllPrivateDataByID", c.service.GetAllPrivateDataByID).Methods("GET")
+	router.HandleFunc("/getAllAccessDatabyID", c.service.GetAllAccessDataByID).Methods("GET")
+	router.HandleFunc("/addPublicData", c.service.AddPublicData).Methods("POST")
+	router.HandleFunc("/addPrivateData", c.service.AddPrivateData).Methods("POST")
+	router.HandleFunc("/getUserIDbyDID", c.service.GetUserIDbyDID).Methods("GET")
+	router.HandleFunc("/getDIDbyUserID", c.service.GetDIDbyUserID).Methods("GET")
+	router.HandleFunc("/getPvtDataByID", c.service.GetPvtDataByID).Methods("GET")
+	router.HandleFunc("/api/v1/generate-smart-contract", service.GenerateSmartContract).Methods("POST")
+	router.HandleFunc("/api/v1/deploy-smart-contract", service.DeploySmartContract).Methods("POST")
+	router.HandleFunc("/api/v1/execute-smart-contract", service.ExecuteSmartContract).Methods("POST")
+	router.HandleFunc("/api/v1/subscribe-smart-contract", service.SubscribeSmartContract).Methods("POST")
 	//enable swagger
 	c.EnableSwagger(c.getURL(), router)
 	// Use the gorilla/mux router
