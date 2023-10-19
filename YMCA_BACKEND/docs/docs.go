@@ -257,7 +257,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.PrivateDataResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.PrivateDataResponse"
+                            }
                         }
                     }
                 }
@@ -286,7 +289,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.PublicDataResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.PublicDataResponse"
+                            }
                         }
                     }
                 }
