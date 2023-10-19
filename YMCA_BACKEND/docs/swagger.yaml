@@ -25,7 +25,7 @@ definitions:
         type: string
       ciphertext:
         type: string
-      userID:
+      user_id:
         type: integer
     type: object
   model.DecryptDataResponse:
@@ -48,7 +48,7 @@ definitions:
         type: string
       status:
         type: boolean
-      userID:
+      user_id:
         type: integer
     type: object
   model.PrivateData:
@@ -134,7 +134,7 @@ definitions:
         type: string
       status:
         type: boolean
-      userID:
+      user_id:
         type: integer
     type: object
   service.DeploySmartContractInput:

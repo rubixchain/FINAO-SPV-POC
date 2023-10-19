@@ -508,7 +508,7 @@
                 "ciphertext": {
                     "type": "string"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -544,7 +544,7 @@
                 "status": {
                     "type": "boolean"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -677,7 +677,7 @@
                 "status": {
                     "type": "boolean"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }

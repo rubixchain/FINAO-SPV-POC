@@ -520,7 +520,7 @@ const docTemplate = `{
                 "ciphertext": {
                     "type": "string"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -556,7 +556,7 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -689,7 +689,7 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
