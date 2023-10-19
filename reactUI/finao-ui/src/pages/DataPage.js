@@ -13,14 +13,44 @@ const DataPage = () => {
     const [privateData, setPrivateData] = useState([]);
     const [publicData, setPublicData] = useState([]);
     const [accessData, setAccessData] = useState([]);
+    const [decryptedPrivateData, setDecryptedPrivateData] = useState({});
+    const [decryptedAccessData, setDecryptedAccessData] = useState({});
     const [error, setError] = useState(null);
+
 
 
     const userId = sessionStorage.getItem('UserID');
 
-    const handleButtonClick = (data) => {
-        // TODO: Add the logic for the API call here
-        console.log(data);
+    const handleButtonClick = async (data, index, section) => {
+        try {
+            const response = await fetch('http://localhost:8080/decryptData', {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    capsule: data.capsule,
+                    ciphertext: data.cipher_text,
+                    user_id: parseInt(userId, 10),
+                })
+            });
+
+            if (response.status === 200) {
+                const result = await response.json();
+                console.log(result);
+                if (section === 'private') {
+                    setDecryptedPrivateData(prevState => ({ ...prevState, [index]: result }));
+                } else if (section === 'access') {
+                    setDecryptedAccessData(prevState => ({ ...prevState, [index]: result }));
+                }
+            } else {
+                setError('You don\'t have enough permission to decrypt the data');
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Error decrypting data');
+        }
     };
 
     useEffect(() => {
@@ -51,36 +81,58 @@ const DataPage = () => {
         <Container component="main" maxWidth="md">
             <StyledPaper elevation={3}>
                 {error && <Alert severity="error">{error}</Alert>}
+
                 <Typography variant="h5" gutterBottom>
                     Private Data
                 </Typography>
+
                 {privateData && privateData.map((data, index) => (
                     <Box key={index} mb={2}>
-                        <Typography><strong>Capsule:</strong> {data.capsule}</Typography>
-                        <Typography><strong>Cipher Text:</strong> {data.cipher_text}</Typography>
-                        <Button variant="outlined" color="primary" onClick={() => handleButtonClick(data)}>Decrypt</Button>
+                        {decryptedPrivateData[index] ? (<>
+                            <Typography><strong>Focus Area:</strong> {decryptedPrivateData[index].focus_area}</Typography>
+                            <Typography><strong>Communities:</strong> {decryptedPrivateData[index].communities}</Typography>
+                        </>
+                        ) : (
+                            <>
+                                <Typography><strong>Capsule:</strong> {data.capsule}</Typography>
+                                <Typography><strong>Cipher Text:</strong> {data.cipher_text}</Typography>
+                                <Button variant="outlined" color="primary" onClick={() => handleButtonClick(data, index, 'private')}>Decrypt</Button>                            </>
+                        )}
                     </Box>
                 ))}
+
                 <Divider />
+
                 <Typography variant="h5" gutterBottom style={{ marginTop: '1rem' }}>
                     Public Data
                 </Typography>
+
                 {publicData && publicData.length > 0 && publicData.map((data, index) => (
                     <Box key={index} mb={2}>
                         <Typography><strong>Focus Area:</strong> {data.focus_area}</Typography>
                         <Typography><strong>Communities:</strong> {data.communities}</Typography>
                     </Box>
                 ))}
+
                 <Divider />
+
                 <Typography variant="h5" gutterBottom style={{ marginTop: '1rem' }}>
                     Access Data
                 </Typography>
+
                 {accessData.length > 0 && accessData.map((data, index) => (
                     <Box key={index} mb={2}>
-                        <Typography><strong>Capsule:</strong> {data.capsule}</Typography>
-                        <Typography><strong>Cipher Text:</strong> {data.cipher_text}</Typography>
-                        <Typography><strong>User ID:</strong> {data.user_id}</Typography>
-                        <Button variant="outlined" color="primary" onClick={() => handleButtonClick(data)}>Decrypt</Button>
+                        {decryptedAccessData[index] ? (<>
+                            <Typography><strong>Focus Area:</strong> {decryptedAccessData[index].focus_area}</Typography>
+                            <Typography><strong>Communities:</strong> {decryptedAccessData[index].communities}</Typography>
+                        </>
+                        ) : (
+                            <>
+                                <Typography><strong>Capsule:</strong> {data.capsule}</Typography>
+                                <Typography><strong>Cipher Text:</strong> {data.cipher_text}</Typography>
+                                <Typography><strong>User ID:</strong> {data.user_id}</Typography>
+                                <Button variant="outlined" color="primary" onClick={() => handleButtonClick(data, index, 'access')}>Decrypt</Button>                            </>
+                        )}
                     </Box>
                 ))}
             </StyledPaper>

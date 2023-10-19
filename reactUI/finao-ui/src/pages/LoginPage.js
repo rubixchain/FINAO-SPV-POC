@@ -66,18 +66,19 @@ function LoginPage() {
       password,
     });
 
-    if (data && data.UserID !== 0) {
-      sessionStorage.setItem('UserID', data.UserID);
-      setSnackbarMessage('User authenticated successfully');
+    if (data && data.status && data.user_id) { // Check for data.status and data.user_id
+      sessionStorage.setItem('UserID', data.user_id); // Use data.user_id instead of data.UserID
+      setSnackbarMessage(data.message || 'User authenticated successfully'); // Use the message from the API response
       setOpenSnackbar(true);
       setTimeout(() => {
         navigate('/focus');
       }, 2000);
     } else if (data) {
-      setSnackbarMessage(data.message);
+      setSnackbarMessage(data.message || 'Login failed'); // Use the message from the API response or a default message
       setOpenSnackbar(true);
     }
-  };
+};
+
 
   
 
