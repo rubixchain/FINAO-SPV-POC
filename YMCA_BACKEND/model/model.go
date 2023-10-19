@@ -144,3 +144,24 @@ type EncryptionResponse struct {
 	Capsule    string `json:"capsule"`
 	Ciphertext string `json:"ciphertext"`
 }
+
+type DecryptDataRequest struct {
+	Capsule    string `json:"capsule"`
+	Ciphertext string `json:"ciphertext"`
+	UserID     int    `json:user_id"`
+}
+
+type DecryptDataResponse struct {
+	FocusArea   string `json:"focus_area"`
+	Communities string `json:"communities"`
+}
+
+type DecryptServerInput struct {
+	Capsule    string `json:"capsule"`
+	Ciphertext string `json:"ciphertext"`
+	SecretKey  string `json:"secretKey"`
+}
+
+type DecryptServerResponse struct {
+	PlainText string `json:"plaintext"`
+}

@@ -541,3 +541,46 @@ func (s *Service) GetPvtDataByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+// decryptData
+// @Summary Decrypt the private data for the user who has access
+// @Description Decrypt the private data for the user who has access
+// @Accept json
+// @Produce json
+// @Param EncryptedData body model.DecryptDataRequest true "enter the details"
+// @Success 200 {object} model.DecryptDataResponse
+// @Router /decryptData [post]
+func (s *Service) DecryptData(w http.ResponseWriter, r *http.Request) {
+	var decryptDataReq model.DecryptDataRequest
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&decryptDataReq); err != nil {
+		http.Error(w, "Failed to parse JSON request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	secretKeys, err := s.storage.GetKeyDetails(decryptDataReq.UserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	decryptServerInput := &model.DecryptServerInput{
+		Capsule:    decryptDataReq.Capsule,
+		Ciphertext: decryptDataReq.Ciphertext,
+		SecretKey:  secretKeys.SecretKey,
+	}
+
+	decryptServerRes, err := util.DecryptData(decryptServerInput)
+
+	var response model.DecryptDataResponse
+
+	// Unmarshal the JSON string into the DecryptDataResponse struct
+	err = json.Unmarshal([]byte(decryptServerRes.PlainText), &response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
