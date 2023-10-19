@@ -163,7 +163,7 @@ func (s *Service) LogIn(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param user_id query int true "User's ID"
-// @Success 200 {object} model.PublicDataResponse
+// @Success 200 {object} []model.PublicDataResponse
 // @Router /getAllPublicDataByID [get]
 func (s *Service) GetAllPublicDataByID(w http.ResponseWriter, r *http.Request) {
 	userIDStr := r.URL.Query().Get("user_id")
@@ -177,22 +177,26 @@ func (s *Service) GetAllPublicDataByID(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Query the database to fetch public data for the user with the given DID
 	// Replace the following line with your database query logic
-	publicData, err := s.storage.GetPublicDataByID(userID)
+	publicDataList, err := s.storage.GetPublicDataByID(userID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Create a PublicDataResponse from the retrieved data
-	response := &model.PublicDataResponse{
-		FocusArea:   publicData.FocusArea,
-		Communities: publicData.Communities,
-		UserID:      publicData.UserID,
+	// Create a slice of PublicDataResponse from the retrieved data
+	responseList := make([]model.PublicDataResponse, len(publicDataList))
+
+	for i, publicData := range publicDataList {
+		responseList[i] = model.PublicDataResponse{
+			FocusArea:   publicData.FocusArea,
+			Communities: publicData.Communities,
+			UserID:      publicData.UserID,
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(responseList)
 }
 
 // @Summary Return user private data by ID
@@ -200,7 +204,7 @@ func (s *Service) GetAllPublicDataByID(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param user_id query int true "User's ID"
-// @Success 200 {object} model.PrivateDataResponse
+// @Success 200 {object} []model.PrivateDataResponse
 // @Router /getAllPrivateDataByID [get]
 func (s *Service) GetAllPrivateDataByID(w http.ResponseWriter, r *http.Request) {
 	userIDStr := r.URL.Query().Get("user_id")
@@ -214,22 +218,28 @@ func (s *Service) GetAllPrivateDataByID(w http.ResponseWriter, r *http.Request) 
 
 	// TODO: Query the database to fetch public data for the user with the given DID
 	// Replace the following line with your database query logic
-	privateData, err := s.storage.GetPrivateDataByID(userID)
+	privateDataList, err := s.storage.GetPrivateDataByID(userID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Create a PrivateDataResponse from the retrieved data
-	response := &model.PrivateDataResponse{
-		Capsule:    privateData.Capsule,
-		CipherText: privateData.CipherText,
-		UserID:     privateData.UserID,
+	// Create a slice of PrivateDataResponse from the retrieved data
+	responseList := make([]model.PrivateDataResponse, len(privateDataList))
+
+	for i, privateData := range privateDataList {
+		responseList[i] = model.PrivateDataResponse{
+			Capsule:    privateData.Capsule,
+			CipherText: privateData.CipherText,
+			UserID:     privateData.UserID,
+		}
 	}
 
+	// Now responseList is of type []model.PrivateDataResponse
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(responseList)
 }
 
 // @Summary Return user private data that has been given access to a  ID
