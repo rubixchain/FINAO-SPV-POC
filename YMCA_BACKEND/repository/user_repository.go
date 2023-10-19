@@ -75,7 +75,7 @@ func (repository *Repository) UpdateUserDID(userID int, did string) error {
 }
 
 // GetPublicDataByDID fetches the public data of a user by their DID, sorted by created time in descending order.
-func (repo *Repository) GetPublicDataByID(userID int) (*model.PublicData, error) {
+func (repo *Repository) GetPublicDataByID(userID int) ([]model.PublicData, error) {
 	// Define the SQL query to fetch public data by DID and sort by created time in descending order
 	query := `
 		SELECT pub_data_id, focus_area, communities, user_id, created_at, updated_at
@@ -84,54 +84,86 @@ func (repo *Repository) GetPublicDataByID(userID int) (*model.PublicData, error)
 		ORDER BY created_at DESC;`
 
 	// Execute the query and retrieve the public data
-	var publicData model.PublicData
-	err := repo.db.QueryRow(query, userID).Scan(
-		&publicData.PubDataID,
-		&publicData.FocusArea,
-		&publicData.Communities,
-		&publicData.UserID,
-		&publicData.CreatedAt,
-		&publicData.UpdatedAt,
-	)
-
+	rows, err := repo.db.Query(query, userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("public data not found for user ID: %s", userID)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var publicDataList []model.PublicData
+
+	for rows.Next() {
+		var publicData model.PublicData
+		err := rows.Scan(
+			&publicData.PubDataID,
+			&publicData.FocusArea,
+			&publicData.Communities,
+			&publicData.UserID,
+			&publicData.CreatedAt,
+			&publicData.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
 		}
+
+		publicDataList = append(publicDataList, publicData)
+	}
+
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return &publicData, nil
+	if len(publicDataList) == 0 {
+		return nil, fmt.Errorf("public data not found for user ID: %d", userID)
+	}
+
+	return publicDataList, nil
 }
 
 // GetPrivateataByDID fetches the public data of a user by their DID, sorted by created time in descending order.
-func (repo *Repository) GetPrivateDataByID(userID int) (*model.PrivateData, error) {
-	// Define the SQL query to fetch public data by DID and sort by created time in descending order
+func (repo *Repository) GetPrivateDataByID(userID int) ([]model.PrivateData, error) {
+	// Define the SQL query to fetch private data by user ID and sort by created time in descending order
 	query := `
-		SELECT pvt_data_id, focus_area, communities, user_id, created_at, updated_at
+		SELECT pvt_data_id, capsule, cipher_text, user_id, created_at, updated_at
 		FROM privatedata
 		WHERE user_id = ?
 		ORDER BY created_at DESC;`
 
-	// Execute the query and retrieve the public data
-	var privateData model.PrivateData
-	err := repo.db.QueryRow(query, userID).Scan(
-		&privateData.PvtDataID,
-		&privateData.Capsule,
-		&privateData.CipherText,
-		&privateData.UserID,
-		&privateData.CreatedAt,
-		&privateData.UpdatedAt,
-	)
-
+	// Execute the query and retrieve the private data
+	rows, err := repo.db.Query(query, userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("public data not found for userID : %s", userID)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var privateDataList []model.PrivateData
+
+	for rows.Next() {
+		var privateData model.PrivateData
+		err := rows.Scan(
+			&privateData.PvtDataID,
+			&privateData.Capsule,
+			&privateData.CipherText,
+			&privateData.UserID,
+			&privateData.CreatedAt,
+			&privateData.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
 		}
+
+		privateDataList = append(privateDataList, privateData)
+	}
+
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return &privateData, nil
+	if len(privateDataList) == 0 {
+		return nil, fmt.Errorf("private data not found for user ID: %d", userID)
+	}
+
+	return privateDataList, nil
 }
 
 // GetAllAccessDataByDID retrieves private data by DID.
