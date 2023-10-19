@@ -19,6 +19,22 @@ definitions:
       userID:
         type: integer
     type: object
+  model.DecryptDataRequest:
+    properties:
+      capsule:
+        type: string
+      ciphertext:
+        type: string
+      userID:
+        type: integer
+    type: object
+  model.DecryptDataResponse:
+    properties:
+      communities:
+        type: string
+      focus_area:
+        type: string
+    type: object
   model.LogInRequest:
     properties:
       email:
@@ -305,6 +321,26 @@ paths:
           schema:
             $ref: '#/definitions/service.RubixResponse'
       summary: This function subscribes the smart contract
+  /decryptData:
+    post:
+      consumes:
+      - application/json
+      description: Decrypt the private data for the user who has access
+      parameters:
+      - description: enter the details
+        in: body
+        name: EncryptedData
+        required: true
+        schema:
+          $ref: '#/definitions/model.DecryptDataRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DecryptDataResponse'
+      summary: Decrypt the private data for the user who has access
   /getAllAccessDatabyID:
     get:
       consumes:
