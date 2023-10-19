@@ -9,11 +9,11 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 }));
 
 const Navbar = () => {
-    const userId = sessionStorage.getItem('user_id');
+    const userId = sessionStorage.getItem('UserID');
     const navigate = useNavigate();
 
     const handleSignout = () => {
-        sessionStorage.removeItem('user_id');
+        sessionStorage.removeItem('UserID');
         window.location.reload();
     };
 
