@@ -202,7 +202,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.PrivateDataResponse'
+            items:
+              $ref: '#/definitions/model.PrivateDataResponse'
+            type: array
       summary: Return user private data by ID
   /getAllPublicDataByID:
     get:
@@ -221,7 +223,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.PublicDataResponse'
+            items:
+              $ref: '#/definitions/model.PublicDataResponse'
+            type: array
       summary: Return user public data by ID
   /getDIDbyUserID:
     get:
