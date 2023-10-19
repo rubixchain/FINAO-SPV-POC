@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, TextField, Container, Typography, Select, MenuItem, FormControl, InputLabel, Checkbox, ListItemText, Paper, Grid } from '@mui/material';
 import { styled } from '@mui/system';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     marginTop: theme.spacing(8),
@@ -110,29 +112,28 @@ const FocusPage = () => {
     };
     
     const handleSubmit = async () => {
-        // If any private data is selected, call the addPrivateData API
-        if (hasPrivateDataSelected()) {
-            const privateDataResponse = await addPrivateData();
-    
-            // Check if the call was successful
-            if (privateDataResponse && privateDataResponse.status) {
-                console.log('Private data added successfully');
+        try {
+            let response;
+            if (hasPrivateDataSelected()) {
+                response = await addPrivateData();
+                if (response && response.status) {
+                    toast.success('Private data added successfully');
+                } else {
+                    toast.error('Error adding private data');
+                }
             } else {
-                console.error('Error adding private data');
+                response = await addPublicData();
+                if (response && response.status) {
+                    toast.success('Public data added successfully');
+                } else {
+                    toast.error('Error adding public data');
+                }
             }
-        } else {
-            // If no private data is selected, call the addPublicData API
-            const publicDataResponse = await addPublicData();
-    
-            // Check if the call was successful
-            if (publicDataResponse && publicDataResponse.status) {
-                console.log('Public data added successfully');
-            } else {
-                console.error('Error adding public data');
-            }
+        } catch (error) {
+            toast.error('An unexpected error occurred');
         }
     };
-      
+
       return (
         <Container component="main" maxWidth="sm">
             <StyledPaper elevation={3}>
@@ -218,6 +219,7 @@ const FocusPage = () => {
                 <Button variant="contained" color="primary" fullWidth style={{ marginTop: '1rem' }} onClick={handleSubmit}>Submit</Button>
                 <Button variant="outlined" color="secondary" fullWidth style={{ marginTop: '1rem' }} onClick={handleCancel}>Cancel</Button>
             </StyledPaper>
+            <ToastContainer />
         </Container>
     );
 }
