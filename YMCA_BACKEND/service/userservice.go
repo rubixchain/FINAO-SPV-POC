@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -555,6 +556,7 @@ func (s *Service) DecryptData(w http.ResponseWriter, r *http.Request) {
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&decryptDataReq); err != nil {
+		fmt.Println("Error decoding JSON:", err)
 		http.Error(w, "Failed to parse JSON request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -572,6 +574,10 @@ func (s *Service) DecryptData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decryptServerRes, err := util.DecryptData(decryptServerInput)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	var response model.DecryptDataResponse
 

@@ -51,7 +51,7 @@ type SignUpRequest struct {
 }
 
 type SignUpResponse struct {
-	UserID  int    `json:""status"`
+	UserID  int    `json:"user_id"`
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
 }
@@ -62,7 +62,7 @@ type LogInRequest struct {
 }
 
 type LogInResponse struct {
-	UserID  int    `json:""status"`
+	UserID  int    `json:"user_id"`
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
 }
@@ -148,7 +148,7 @@ type EncryptionResponse struct {
 type DecryptDataRequest struct {
 	Capsule    string `json:"capsule"`
 	Ciphertext string `json:"ciphertext"`
-	UserID     int    `json:user_id"`
+	UserID     int    `json:"user_id"`
 }
 
 type DecryptDataResponse struct {
