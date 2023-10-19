@@ -163,3 +163,34 @@ func EncryptData(publicKey, plaintext string) (model.EncryptionResponse, error) 
 
 	return response, nil
 }
+
+func DecryptData(input *model.DecryptServerInput) (model.DecryptServerResponse, error) {
+	url := "http://localhost:3000/decrypt"
+
+	// Convert the input data to JSON
+	requestBody, err := json.Marshal(input)
+	if err != nil {
+		return model.DecryptServerResponse{}, err
+	}
+
+	// Send the POST request
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil {
+		return model.DecryptServerResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return model.DecryptServerResponse{}, fmt.Errorf("Request failed with status code: %d", resp.StatusCode)
+	}
+
+	// Decode the response JSON
+	var response model.DecryptServerResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return model.DecryptServerResponse{}, err
+	}
+
+	return response, nil
+}

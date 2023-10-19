@@ -51,7 +51,7 @@ type SignUpRequest struct {
 }
 
 type SignUpResponse struct {
-	UserID  int    `json:""status"`
+	UserID  int    `json:"user_id"`
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
 }
@@ -62,7 +62,7 @@ type LogInRequest struct {
 }
 
 type LogInResponse struct {
-	UserID  int    `json:""status"`
+	UserID  int    `json:"user_id"`
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
 }
@@ -143,4 +143,25 @@ type EncryptionRequest struct {
 type EncryptionResponse struct {
 	Capsule    string `json:"capsule"`
 	Ciphertext string `json:"ciphertext"`
+}
+
+type DecryptDataRequest struct {
+	Capsule    string `json:"capsule"`
+	Ciphertext string `json:"ciphertext"`
+	UserID     int    `json:"user_id"`
+}
+
+type DecryptDataResponse struct {
+	FocusArea   string `json:"focus_area"`
+	Communities string `json:"communities"`
+}
+
+type DecryptServerInput struct {
+	Capsule    string `json:"capsule"`
+	Ciphertext string `json:"ciphertext"`
+	SecretKey  string `json:"secretKey"`
+}
+
+type DecryptServerResponse struct {
+	PlainText string `json:"plaintext"`
 }

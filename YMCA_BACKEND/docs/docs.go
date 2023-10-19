@@ -202,6 +202,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/decryptData": {
+            "post": {
+                "description": "Decrypt the private data for the user who has access",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Decrypt the private data for the user who has access",
+                "parameters": [
+                    {
+                        "description": "enter the details",
+                        "name": "EncryptedData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DecryptDataRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.DecryptDataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/getAllAccessDatabyID": {
             "get": {
                 "description": "Get rivate data that has been given access to a  ID",
@@ -480,6 +511,31 @@ const docTemplate = `{
                 }
             }
         },
+        "model.DecryptDataRequest": {
+            "type": "object",
+            "properties": {
+                "capsule": {
+                    "type": "string"
+                },
+                "ciphertext": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.DecryptDataResponse": {
+            "type": "object",
+            "properties": {
+                "communities": {
+                    "type": "string"
+                },
+                "focus_area": {
+                    "type": "string"
+                }
+            }
+        },
         "model.LogInRequest": {
             "type": "object",
             "properties": {
@@ -500,7 +556,7 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -633,7 +689,7 @@ const docTemplate = `{
                 "status": {
                     "type": "boolean"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
