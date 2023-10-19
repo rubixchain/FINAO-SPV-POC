@@ -9,11 +9,11 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 }));
 
 const Navbar = () => {
-    const userId = sessionStorage.getItem('user_id');
+    const userId = sessionStorage.getItem('UserID');
     const navigate = useNavigate();
 
     const handleSignout = () => {
-        sessionStorage.removeItem('user_id');
+        sessionStorage.removeItem('UserID');
         window.location.reload();
     };
 
@@ -29,6 +29,10 @@ const Navbar = () => {
         navigate('/focus');
     };
 
+    const navigateData = () => {
+        navigate('/data');
+    }
+
     return (
         <StyledAppBar position="static">
             <Toolbar>
@@ -38,7 +42,10 @@ const Navbar = () => {
                 <Typography variant="h6" style={{ flexGrow: 1 }}>
                     Rubix - FINAO PoC
                 </Typography>
-                <Button color="inherit" onClick={navigateFocus}>Add Data</Button> {/* <-- Add onClick handler */}
+                <Button color="inherit" onClick={navigateFocus}>Add Data</Button>
+                {userId && (
+                    <Button color="inherit" onClick={navigateData}>View Data</Button>
+                )}
                 {userId ? (
                     <Button color="inherit" onClick={handleSignout}>
                         <ExitToAppIcon /> Sign Out

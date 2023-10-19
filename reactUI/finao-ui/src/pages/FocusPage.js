@@ -10,11 +10,15 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
 }));
 
+
 const FocusPage = () => {
     const [selectedFocusAreas, setSelectedFocusAreas] = useState([]);
     const [selectedCommunities, setSelectedCommunities] = useState([]);
     const [privateData, setPrivateData] = useState({});
     const [userIdData, setUserIdData] = useState({});
+    const [whomToShareWith, setWhomToShareWith] = useState('');
+    const userId = parseInt(sessionStorage.getItem('UserID'),10);
+
 
     const handlePrivateChange = (event, name) => {
         event.stopPropagation();
@@ -29,7 +33,107 @@ const FocusPage = () => {
         window.location.reload();
     };
 
-    return (
+    const hasPrivateDataSelected = () => {
+        return Object.values(privateData).some(value => value === true);
+    };
+
+    const generateCurlCommand = (url, method, headers, body) => {
+        let curlCmd = `curl -X '${method}' '${url}'`;
+    
+        for (const header in headers) {
+            curlCmd += ` -H '${header}: ${headers[header]}'`;
+        }
+    
+        if (body) {
+            curlCmd += ` -d '${JSON.stringify(body)}'`;
+        }
+    
+        return curlCmd;
+    };
+    
+
+    const addPublicData = async () => {
+        const apiUrl = 'http://localhost:8080/addPublicData';
+        const apiHeaders = {
+            'Content-Type': 'application/json',
+        };
+        const apiBody = {
+            communities: selectedCommunities.join(', '),
+            focus_area: selectedFocusAreas.join(', '),
+            user_id: userId,
+        };
+    
+        // Print the curl command
+        console.log(generateCurlCommand(apiUrl, 'POST', apiHeaders, apiBody));
+    
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: apiHeaders,
+            body: JSON.stringify(apiBody),
+        });
+        
+        const rawResponse = await response.text();
+        console.log("Raw Response:", rawResponse);
+        
+        try {
+            const data = JSON.parse(rawResponse);
+            return data;
+        } catch (error) {
+            console.error("Error parsing JSON:", error);
+        }
+    };
+    
+    const addPrivateData = async () => {
+        const apiUrl = 'http://localhost:8080/addPrivateData';
+        const apiHeaders = {
+            'Content-Type': 'application/json',
+            'accept': 'application/json'
+        };
+        const apiBody = {
+            communities: selectedCommunities.join(', '),
+            focus_area: selectedFocusAreas.join(', '),
+            decrypt_user_id: parseInt(whomToShareWith, 10), 
+            user_id: userId
+        };
+    
+        // Print the curl command
+        console.log(generateCurlCommand(apiUrl, 'POST', apiHeaders, apiBody));
+    
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: apiHeaders,
+            body: JSON.stringify(apiBody),
+        });
+    
+        const data = await response.json();
+        return data;
+    };
+    
+    const handleSubmit = async () => {
+        // If any private data is selected, call the addPrivateData API
+        if (hasPrivateDataSelected()) {
+            const privateDataResponse = await addPrivateData();
+    
+            // Check if the call was successful
+            if (privateDataResponse && privateDataResponse.status) {
+                console.log('Private data added successfully');
+            } else {
+                console.error('Error adding private data');
+            }
+        } else {
+            // If no private data is selected, call the addPublicData API
+            const publicDataResponse = await addPublicData();
+    
+            // Check if the call was successful
+            if (publicDataResponse && publicDataResponse.status) {
+                console.log('Public data added successfully');
+            } else {
+                console.error('Error adding public data');
+            }
+        }
+    };
+      
+      return (
         <Container component="main" maxWidth="sm">
             <StyledPaper elevation={3}>
                 <Typography variant="h4" align="center" gutterBottom>Select Focus Area</Typography>
@@ -60,16 +164,6 @@ const FocusPage = () => {
                                     <Grid item xs>
                                         <ListItemText primary={area} />
                                     </Grid>
-                                    {privateData[area] && 
-                                    <Grid item xs={4}>
-                                        <TextField
-                                            fullWidth
-                                            placeholder="Whom to share data"
-                                            onChange={(e) => handleUserIdChange(area, e.target.value)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onKeyDown={(e) => e.stopPropagation()}
-                                        />
-                                    </Grid>}
                                 </Grid>
                             </MenuItem>
                         ))}
@@ -104,23 +198,24 @@ const FocusPage = () => {
                                     <Grid item xs>
                                         <ListItemText primary={community} />
                                     </Grid>
-                                    {privateData[community] && 
-                                    <Grid item xs={4}>
-                                        <TextField
-                                            fullWidth
-                                            placeholder="Whom to share data"
-                                            onChange={(e) => handleUserIdChange(community, e.target.value)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onKeyDown={(e) => e.stopPropagation()}
-                                        />
-                                    </Grid>}
                                 </Grid>
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
 
-                <Button variant="contained" color="primary" fullWidth style={{ marginTop: '1rem' }}>Submit</Button>
+                {/* Single "Whom to share" input */}
+                {hasPrivateDataSelected() && (
+                <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Whom to share data with"
+                    value={whomToShareWith}
+                    onChange={(e) => setWhomToShareWith(e.target.value)}
+                />
+                )}
+
+                <Button variant="contained" color="primary" fullWidth style={{ marginTop: '1rem' }} onClick={handleSubmit}>Submit</Button>
                 <Button variant="outlined" color="secondary" fullWidth style={{ marginTop: '1rem' }} onClick={handleCancel}>Cancel</Button>
             </StyledPaper>
         </Container>

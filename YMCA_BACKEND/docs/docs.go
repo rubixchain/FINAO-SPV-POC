@@ -78,6 +78,130 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/deploy-smart-contract": {
+            "post": {
+                "description": "This endpoint is used to deploy the smart contract token and token chain to the network.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "This function deploys the smart contract token",
+                "parameters": [
+                    {
+                        "description": "Give the input",
+                        "name": "smart_contract_input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.DeploySmartContractInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.RubixResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/execute-smart-contract": {
+            "post": {
+                "description": "This endpoint is used to execute the smart contract. When a smart contract is executed the tokenchain is updated, this updation happens here.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "This function update the token chain",
+                "parameters": [
+                    {
+                        "description": "Give the input",
+                        "name": "smart_contract_input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.ExecuteSmartContractInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.RubixResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/generate-smart-contract": {
+            "post": {
+                "description": "This endpoint is used to generate the smart contract token and the genesis block of the tokenchain",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "This function generates the smart contract token",
+                "parameters": [
+                    {
+                        "description": "Give the input",
+                        "name": "smart_contract_input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.SmartContractInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.RubixResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/subscribe-smart-contract": {
+            "post": {
+                "description": "This endpoint is used to subscribe the smart contract.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "This function subscribes the smart contract",
+                "parameters": [
+                    {
+                        "description": "Give the input",
+                        "name": "subscribe_smart_contract_input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.SubscribeContractRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.RubixResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/getAllAccessDatabyID": {
             "get": {
                 "description": "Get rivate data that has been given access to a  ID",
@@ -511,6 +635,95 @@ const docTemplate = `{
                 },
                 "userID": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.DeploySmartContractInput": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "deployerAddress": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "quorumType": {
+                    "type": "integer"
+                },
+                "rbtAmount": {
+                    "type": "integer"
+                },
+                "smartContractToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.ExecuteSmartContractInput": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "executorAddress": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "quorumType": {
+                    "type": "integer"
+                },
+                "smartContractData": {
+                    "type": "string"
+                },
+                "smartContractToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.RubixResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "result": {},
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "service.SmartContractInput": {
+            "type": "object",
+            "properties": {
+                "binaryCodePath": {
+                    "type": "string"
+                },
+                "did": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "rawCodePath": {
+                    "type": "string"
+                },
+                "schemaFilePath": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.SubscribeContractRequest": {
+            "type": "object",
+            "properties": {
+                "contract": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
                 }
             }
         }

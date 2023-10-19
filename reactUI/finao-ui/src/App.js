@@ -5,6 +5,7 @@ import FocusPage from './pages/FocusPage';
 import ViewPage from './pages/ViewPage';
 import NavBar from './pages/NavBar';
 import HomePage from './pages/HomePage';
+import DataPage from './pages/DataPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/focus" element={<FocusPage />} />
         <Route path="/view" element={<ViewPage />} />
+        <Route path='/data' element={<DataPage />} />
       </Routes>
     </Router>
   );
