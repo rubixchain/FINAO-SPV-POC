@@ -83,7 +83,7 @@ const DataPage = () => {
                 {error && <Alert severity="error">{error}</Alert>}
 
                 <Typography variant="h5" gutterBottom>
-                    Private Data
+                    My Private Data
                 </Typography>
 
                 {privateData && privateData.map((data, index) => (
@@ -104,7 +104,7 @@ const DataPage = () => {
                 <Divider />
 
                 <Typography variant="h5" gutterBottom style={{ marginTop: '1rem' }}>
-                    Public Data
+                    My Public Data
                 </Typography>
 
                 {publicData && publicData.length > 0 && publicData.map((data, index) => (
@@ -117,7 +117,7 @@ const DataPage = () => {
                 <Divider />
 
                 <Typography variant="h5" gutterBottom style={{ marginTop: '1rem' }}>
-                    Access Data
+                    Data Access Given/Received
                 </Typography>
 
                 {accessData.length > 0 && accessData.map((data, index) => (

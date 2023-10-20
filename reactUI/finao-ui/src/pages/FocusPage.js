@@ -21,6 +21,7 @@ const FocusPage = () => {
     const [whomToShareWith, setWhomToShareWith] = useState('');
     const userId = parseInt(sessionStorage.getItem('UserID'),10);
 
+    console.log(sessionStorage.getItem('UserID'),10)
 
     const handlePrivateChange = (event, name) => {
         event.stopPropagation();
@@ -56,6 +57,7 @@ const FocusPage = () => {
 
     const addPublicData = async () => {
         const apiUrl = 'http://localhost:8080/addPublicData';
+        console.log(userId)
         const apiHeaders = {
             'Content-Type': 'application/json',
         };
@@ -137,6 +139,7 @@ const FocusPage = () => {
       return (
         <Container component="main" maxWidth="sm">
             <StyledPaper elevation={3}>
+            <Typography variant="a" align="center" gutterBottom>By default data is public, click on check box to make it private</Typography>
                 <Typography variant="h4" align="center" gutterBottom>Select Focus Area</Typography>
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Focus Area</InputLabel>
