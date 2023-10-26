@@ -347,32 +347,6 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 	res := &model.AddPrivateDataResponse{
 		Status: false,
 	}
-	/* pvtData := &model.PrivateData{
-		Capsule:    addPvtDataReq.Capsule,
-		CipherText: addPvtDataReq.CipherText,
-		UserID:     addPvtDataReq.UserID,
-	}
-	pvtDataId, err := s.storage.AddPrivateData(pvtData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	accessDataMap := &model.AccessSheet{
-		PvtDataID:     pvtDataId,
-		DecryptUserID: addPvtDataReq.DecryptUserID,
-	}
-
-	accessID, err := s.storage.AddAccess(accessDataMap)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	res.Status = true
-	res.Message = "Private data added successfully, Access to Pvt data given"
-	res.AccessID = accessID
-	res.PvtDataID = pvtDataId */
 
 	privateDataEncrypt := model.PrivateDataEncrypt{
 		FocusArea:   addPvtDataReq.FocusArea,
@@ -384,9 +358,6 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	/* s.log.Println(addPvtDataReq.UserID)
-	s.log.Println(addPvtDataReq.DecryptUserID) */
 
 	userIDs := make([]int, 0)
 	userIDs = append(userIDs, addPvtDataReq.UserID)
@@ -418,6 +389,7 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		accessDataMap := &model.AccessSheet{
 			PvtDataID:     pvtDataId,
 			DecryptUserID: userID,
+			OwnerUserID:   addPvtDataReq.UserID,
 		}
 
 		accessID, err := s.storage.AddAccess(accessDataMap)

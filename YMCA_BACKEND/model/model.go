@@ -37,9 +37,12 @@ type PrivateData struct {
 
 // AccessSheet represents access information for private data.
 type AccessSheet struct {
-	AccessID      int `json:"access_id" db:"access_id primarykey"`
-	PvtDataID     int `json:"pvt_data_id" db:"pvt_data_id foreignkey"`
-	DecryptUserID int `json:"decrypt_user_id" db:"decrypt_user_id"`
+	AccessID      int       `json:"access_id" db:"access_id primarykey"`
+	PvtDataID     int       `json:"pvt_data_id" db:"pvt_data_id foreignkey"`
+	DecryptUserID int       `json:"decrypt_user_id" db:"decrypt_user_id"`
+	OwnerUserID   int       `josn:"owner_user_id" db:"owner_user_id"`
+	CreatedAt     time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type SignUpRequest struct {

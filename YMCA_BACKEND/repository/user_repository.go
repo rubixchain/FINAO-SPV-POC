@@ -268,12 +268,12 @@ func (r *Repository) AddPrivateData(data *model.PrivateData) (int, error) {
 func (r *Repository) AddAccess(accessSheet *model.AccessSheet) (int, error) {
 	// Define the SQL query to insert an access sheet entry
 	query := `
-		INSERT INTO accesssheet (pvt_data_id, decrypt_user_id)
-		VALUES (?, ?);
+		INSERT INTO accesssheet (pvt_data_id, decrypt_user_id,owner_user_id,created_at, updated_at)
+		VALUES (?, ?,?,?,?);
 	`
 
 	// Execute the query to insert the access sheet entry
-	result, err := r.db.Exec(query, accessSheet.PvtDataID, accessSheet.DecryptUserID)
+	result, err := r.db.Exec(query, accessSheet.PvtDataID, accessSheet.DecryptUserID, accessSheet.OwnerUserID, time.Now(), time.Now())
 	if err != nil {
 		return 0, err
 	}
@@ -320,10 +320,10 @@ func (r *Repository) GetPvtDataByUserID(userID int) ([]model.PrivateData, error)
         SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text
         FROM privatedata pd
         INNER JOIN accesssheet as ON pd.pvt_data_id = as.pvt_data_id
-        WHERE as.decrypt_user_id = ?;`
+        WHERE as.decrypt_user_id = ? AND as.owner_user_id = ?;`
 
 	// Execute the query and retrieve the private data
-	rows, err := r.db.Query(query, userID)
+	rows, err := r.db.Query(query, userID, userID)
 	if err != nil {
 		return nil, err
 	}
