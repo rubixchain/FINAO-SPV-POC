@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Paper, Box, Divider, Alert, Button } from '@mui/material';
 import { styled } from '@mui/system';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const StyledPaper = styled(Paper)(({ theme }) => ({
     marginTop: theme.spacing(4),
     padding: theme.spacing(3),
@@ -45,11 +48,14 @@ const DataPage = () => {
                     setDecryptedAccessData(prevState => ({ ...prevState, [index]: result }));
                 }
             } else {
-                setError('You don\'t have enough permission to decrypt the data');
+                toast.error('You don\'t have enough permission to decrypt the data');
+                /* setError('You don\'t have enough permission to decrypt the data'); */
             }
         } catch (err) {
             console.error(err);
-            setError('Error decrypting data');
+            toast.error('Error decrypting data');
+            /* setError('Error decrypting data');
+ */
         }
     };
 
@@ -77,6 +83,7 @@ const DataPage = () => {
     }, [userId]);
 
     console.log("Public Data:", publicData);
+    console.log("access Data:", accessData);
     return (
         <Container component="main" maxWidth="md">
             <StyledPaper elevation={3}>
@@ -130,12 +137,15 @@ const DataPage = () => {
                             <>
                                 <Typography><strong>Capsule:</strong> {data.capsule}</Typography>
                                 <Typography><strong>Cipher Text:</strong> {data.cipher_text}</Typography>
-                                <Typography><strong>User ID:</strong> {data.user_id}</Typography>
+                                {/* <Typography><strong>User ID:</strong> {data.user_id}</Typography> */}
+                                {data.access_type === "Access Given" ? (<Typography><strong> Access given to User ID:</strong> {data.decrypt_user_id}</Typography>) : (<Typography><strong>Owner User ID:</strong> {data.OwnerUserID}</Typography>)}
+                                <Typography><strong>Access Type:</strong> {data.access_type}</Typography>
                                 <Button variant="outlined" color="primary" onClick={() => handleButtonClick(data, index, 'access')}>Decrypt</Button>                            </>
                         )}
                     </Box>
                 ))}
             </StyledPaper>
+            <ToastContainer />
         </Container>
     );
 }
