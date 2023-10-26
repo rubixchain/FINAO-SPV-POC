@@ -258,7 +258,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.PrivateDataResponse"
+                                "$ref": "#/definitions/model.GetAccessDataResponse"
                             }
                         }
                     }
@@ -533,6 +533,27 @@ const docTemplate = `{
                 },
                 "focus_area": {
                     "type": "string"
+                }
+            }
+        },
+        "model.GetAccessDataResponse": {
+            "type": "object",
+            "properties": {
+                "access_type": {
+                    "type": "string"
+                },
+                "capsule": {
+                    "type": "string"
+                },
+                "cipher_text": {
+                    "type": "string"
+                },
+                "decrypt_user_id": {
+                    "type": "integer"
+                },
+                "ownerUserID": {
+                    "description": "UserID      int    ` + "`" + `json:\"user_id\" db:\"user_id\"` + "`" + `",
+                    "type": "integer"
                 }
             }
         },
