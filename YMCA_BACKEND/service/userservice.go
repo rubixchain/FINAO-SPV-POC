@@ -219,7 +219,7 @@ func (s *Service) GetAllPrivateDataByID(w http.ResponseWriter, r *http.Request) 
 
 	// TODO: Query the database to fetch public data for the user with the given DID
 	// Replace the following line with your database query logic
-	privateDataList, err := s.storage.GetPrivateDataByID(userID)
+	privateDataList, err := s.storage.GetPvtDataByUserID(userID)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -248,7 +248,7 @@ func (s *Service) GetAllPrivateDataByID(w http.ResponseWriter, r *http.Request) 
 // @Accept json
 // @Produce json
 // @Param user_id query int true "User's ID"
-// @Success 200 {object} []model.PrivateDataResponse
+// @Success 200 {object} []model.GetAccessDataResponse
 // @Router /getAllAccessDatabyID [get]
 func (s *Service) GetAllAccessDataByID(w http.ResponseWriter, r *http.Request) {
 	userIDStr := r.URL.Query().Get("user_id")
@@ -269,14 +269,20 @@ func (s *Service) GetAllAccessDataByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a response slice for private data
-	var responseList []model.PrivateDataResponse
+	var responseList []model.GetAccessDataResponse
 
 	// Convert the retrieved private data into the desired response format
 	for _, privateData := range privateDataList {
-		response := model.PrivateDataResponse{
-			Capsule:    privateData.Capsule,
-			CipherText: privateData.CipherText,
-			UserID:     privateData.UserID,
+		response := model.GetAccessDataResponse{
+			Capsule:       privateData.Capsule,
+			CipherText:    privateData.CipherText,
+			OwnerUserID:   privateData.OwnerUserID,
+			DecryptUserID: privateData.DecryptUserID,
+		}
+		if privateData.OwnerUserID == userID {
+			response.AccessType = "Access Given"
+		} else {
+			response.AccessType = "Access Received"
 		}
 		responseList = append(responseList, response)
 	}
@@ -347,32 +353,6 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 	res := &model.AddPrivateDataResponse{
 		Status: false,
 	}
-	/* pvtData := &model.PrivateData{
-		Capsule:    addPvtDataReq.Capsule,
-		CipherText: addPvtDataReq.CipherText,
-		UserID:     addPvtDataReq.UserID,
-	}
-	pvtDataId, err := s.storage.AddPrivateData(pvtData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	accessDataMap := &model.AccessSheet{
-		PvtDataID:     pvtDataId,
-		DecryptUserID: addPvtDataReq.DecryptUserID,
-	}
-
-	accessID, err := s.storage.AddAccess(accessDataMap)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	res.Status = true
-	res.Message = "Private data added successfully, Access to Pvt data given"
-	res.AccessID = accessID
-	res.PvtDataID = pvtDataId */
 
 	privateDataEncrypt := model.PrivateDataEncrypt{
 		FocusArea:   addPvtDataReq.FocusArea,
@@ -384,9 +364,6 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	/* s.log.Println(addPvtDataReq.UserID)
-	s.log.Println(addPvtDataReq.DecryptUserID) */
 
 	userIDs := make([]int, 0)
 	userIDs = append(userIDs, addPvtDataReq.UserID)
@@ -418,6 +395,7 @@ func (s *Service) AddPrivateData(w http.ResponseWriter, r *http.Request) {
 		accessDataMap := &model.AccessSheet{
 			PvtDataID:     pvtDataId,
 			DecryptUserID: userID,
+			OwnerUserID:   addPvtDataReq.UserID,
 		}
 
 		accessID, err := s.storage.AddAccess(accessDataMap)

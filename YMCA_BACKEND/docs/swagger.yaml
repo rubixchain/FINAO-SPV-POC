@@ -35,6 +35,20 @@ definitions:
       focus_area:
         type: string
     type: object
+  model.GetAccessDataResponse:
+    properties:
+      access_type:
+        type: string
+      capsule:
+        type: string
+      cipher_text:
+        type: string
+      decrypt_user_id:
+        type: integer
+      ownerUserID:
+        description: UserID      int    `json:"user_id" db:"user_id"`
+        type: integer
+    type: object
   model.LogInRequest:
     properties:
       email:
@@ -359,7 +373,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.PrivateDataResponse'
+              $ref: '#/definitions/model.GetAccessDataResponse'
             type: array
       summary: Return user private data that has been given access to a  ID
   /getAllPrivateDataByID:
