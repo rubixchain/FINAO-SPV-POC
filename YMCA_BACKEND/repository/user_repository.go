@@ -167,46 +167,43 @@ func (repo *Repository) GetPrivateDataByID(userID int) ([]model.PrivateData, err
 }
 
 // GetAllAccessDataByDID retrieves private data by DID.
-func (repo *Repository) GetAllAccessDataByID(userID int) ([]model.PrivateData, error) {
+func (repo *Repository) GetAllAccessDataByID(userID int) ([]model.AccessDataResponse, error) {
 	// Define the SQL query to fetch private data by DID
 	query := `
-		SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text, pd.user_id, pd.created_at, pd.updated_at
-		FROM privatedata pd
-		INNER JOIN accesssheet as acs ON pd.pvt_data_id = acs.pvt_data_id
-		INNER JOIN user u ON acs.decrypt_user_id = u.user_id
-		WHERE u.user_id = ?;`
+	SELECT pd.capsule, pd.cipher_text, acs.owner_user_id, acs.decrypt_user_id
+	FROM privatedata pd
+	INNER JOIN accesssheet acs ON pd.pvt_data_id = acs.pvt_data_id
+	WHERE (acs.decrypt_user_id <> acs.owner_user_id) AND (acs.decrypt_user_id = ? OR acs.owner_user_id = ?);`
 
 	// Execute the query and retrieve the private data
-	rows, err := repo.db.Query(query, userID)
+	rows, err := repo.db.Query(query, userID, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var privateDataList []model.PrivateData
+	var accessDataList []model.AccessDataResponse
 
 	// Iterate through the rows and populate the private data list
 	for rows.Next() {
-		var privateData model.PrivateData
+		var accessData model.AccessDataResponse
 		err := rows.Scan(
-			&privateData.PvtDataID,
-			&privateData.Capsule,
-			&privateData.CipherText,
-			&privateData.UserID,
-			&privateData.CreatedAt,
-			&privateData.UpdatedAt,
+			&accessData.Capsule,
+			&accessData.CipherText,
+			&accessData.OwnerUserID,
+			&accessData.DecryptUserID,
 		)
 		if err != nil {
 			return nil, err
 		}
-		privateDataList = append(privateDataList, privateData)
+		accessDataList = append(accessDataList, accessData)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return privateDataList, nil
+	return accessDataList, nil
 }
 
 // AddPublicData inserts a new public data entry into the PublicData table.
@@ -319,8 +316,8 @@ func (r *Repository) GetPvtDataByUserID(userID int) ([]model.PrivateData, error)
 	query := `
         SELECT pd.pvt_data_id, pd.capsule, pd.cipher_text
         FROM privatedata pd
-        INNER JOIN accesssheet as ON pd.pvt_data_id = as.pvt_data_id
-        WHERE as.decrypt_user_id = ? AND as.owner_user_id = ?;`
+        INNER JOIN accesssheet acs ON pd.pvt_data_id = acs.pvt_data_id
+        WHERE acs.decrypt_user_id = ? AND acs.owner_user_id = ?;`
 
 	// Execute the query and retrieve the private data
 	rows, err := r.db.Query(query, userID, userID)

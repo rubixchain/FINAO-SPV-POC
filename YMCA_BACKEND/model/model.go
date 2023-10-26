@@ -82,6 +82,23 @@ type PrivateDataResponse struct {
 	UserID     int    `json:"user_id" db:"user_id"`
 }
 
+type GetAccessDataResponse struct {
+	Capsule    string `json:"capsule" db:"capsule"`
+	CipherText string `json:"cipher_text" db:"cipher_text"`
+	//UserID      int    `json:"user_id" db:"user_id"`
+	OwnerUserID   int    `josn:"owner_user_id" db:"owner_user_id"`
+	DecryptUserID int    `json:"decrypt_user_id" db:"decrypt_user_id"`
+	AccessType    string `json:"access_type"`
+}
+
+type AccessDataResponse struct {
+	Capsule    string `json:"capsule" db:"capsule"`
+	CipherText string `json:"cipher_text" db:"cipher_text"`
+	//UserID        int    `json:"user_id" db:"user_id"`
+	OwnerUserID   int `josn:"owner_user_id" db:"owner_user_id"`
+	DecryptUserID int `json:"decrypt_user_id" db:"decrypt_user_id"`
+}
+
 type PublicDataInputReq struct {
 	FocusArea   string `json:"focus_area" db:"focus_area"`
 	Communities string `json:"communities" db:"communities"`
